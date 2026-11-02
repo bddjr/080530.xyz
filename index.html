@@ -6,8 +6,8 @@
 <meta name="color-scheme" content="light dark" />
 <meta name="theme-color" content="#eef1f8" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#07070f" media="(prefers-color-scheme: dark)" />
-<link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="preload" as="font" type="font/woff2" href="./fonts/HarmonyOS_Sans_SC_Regular-subset.woff2" crossorigin>
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <title>距离下一个生日倒计时 · 年龄计时</title>
 
 <script>
@@ -43,9 +43,12 @@
     --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #dde4ff 0%, transparent 62%);
     --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #cfeaff 0%, transparent 62%);
     --bg-base: #eef1f8;
+
     --card-bg: rgba(255, 255, 255, .72);
     --card-border: rgba(20, 30, 60, .1);
-    --card-shadow: 0 20px 56px rgba(40, 60, 120, .14);
+    --card-shadow: 0 20px 56px rgba(40, 60, 120, .14),
+                   inset 0 1px 0 rgba(255, 255, 255, .6);
+
     --line: rgba(20, 30, 60, .1);
     --text: #1a1d2e;
     --muted: #5a6178;
@@ -60,7 +63,7 @@
     --select-bg: rgba(255, 255, 255, .85);
     --select-option-bg: #ffffff;
     --select-option-text: #1a1d2e;
-    --select-arrow: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%235a6178' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%235a6178' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
     --focus-color: #3d5afe;
     --focus-ring: rgba(61, 90, 254, .25);
   }
@@ -70,16 +73,20 @@
     --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #2b1055 0%, transparent 62%);
     --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #103247 0%, transparent 62%);
     --bg-base: #07070f;
-    --card-bg: rgba(255, 255, 255, .06);
-    --card-border: rgba(255, 255, 255, .12);
-    --card-shadow: 0 20px 56px rgba(0, 0, 0, .45);
+
+    /* 更暗的卡片底色：低亮度 + 较高不透明度，形成明显的“暗片”隔离 */
+    --card-bg: rgba(8, 9, 18, .78);
+    --card-border: rgba(255, 255, 255, .14);
+    --card-shadow: 0 20px 56px rgba(0, 0, 0, .55),
+                   inset 0 1px 0 rgba(255, 255, 255, .06);
+
     --line: rgba(255, 255, 255, .12);
     --text: #eef1ff;
     --muted: #9aa4c7;
     --subtitle-b: #cdd8ff;
     --flag-color: #ffd479;
-    --unit-bg: rgba(255, 255, 255, .07);
-    --unit-border: rgba(255, 255, 255, .1);
+    --unit-bg: rgba(255, 255, 255, .05);
+    --unit-border: rgba(255, 255, 255, .09);
     --num-color: #ffffff;
     --age-num-color: #ffd479;
     --meta-row-bg: rgba(255, 255, 255, .04);
@@ -87,7 +94,7 @@
     --select-bg: rgba(255, 255, 255, .08);
     --select-option-bg: #16162a;
     --select-option-text: #eef1ff;
-    --select-arrow: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%239aa4c7' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%239aa4c7' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
     --focus-color: #6f8dff;
     --focus-ring: rgba(111, 141, 255, .25);
   }
@@ -128,7 +135,11 @@
   body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100lvh;
     z-index: -1;
     pointer-events: none;
     background:
@@ -137,9 +148,6 @@
       var(--bg-base);
   }
 
-  /* ============================================================
-   * 卡片堆叠容器
-   * ============================================================ */
   .stack {
     width: 100%;
     max-width: 720px;
@@ -156,8 +164,8 @@
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
     text-align: center;
     transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
   }
@@ -170,9 +178,6 @@
     color: var(--muted);
   }
 
-  /* ============================================================
-   * 卡片 1：下一个生日
-   * ============================================================ */
   .birthday-banner {
     display: none;
     margin: 0 0 18px;
@@ -274,9 +279,6 @@
     word-break: break-word;
   }
 
-  /* ============================================================
-   * 卡片 2：年龄计时
-   * ============================================================ */
   .age-countdown {
     display: flex;
     justify-content: center;
@@ -298,9 +300,6 @@
     letter-spacing: 0;
   }
 
-  /* ============================================================
-   * 卡片 3：设置
-   * ============================================================ */
   .controls {
     display: grid;
     grid-template-columns: 1.1fr 1.7fr 0.9fr auto;
@@ -320,7 +319,6 @@
     color: var(--muted);
   }
 
-  /* 输入控件基础样式（select / date / 按钮共用） */
   select,
   input[type="date"],
   .btn {
@@ -384,7 +382,6 @@
     opacity: 1;
   }
 
-  /* 按钮（重置） */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -398,9 +395,6 @@
   }
   .btn:active { transform: translateY(1px); }
 
-  /* ============================================================
-   * 响应式
-   * ============================================================ */
   @media (min-width: 561px) and (max-width: 760px) {
     .controls {
       grid-template-columns: 1fr 1fr;
@@ -556,7 +550,6 @@
 
 <div class="stack">
 
-  <!-- 卡片 1：下一个生日 -->
   <section class="card">
     <div class="birthday-banner" id="birthdayBanner">🎉 生日快乐！</div>
 
@@ -577,7 +570,6 @@
     </div>
   </section>
 
-  <!-- 卡片 2：年龄计时 -->
   <section class="card">
     <h2 class="card-title">⏳ 年龄计时</h2>
     <div class="age-countdown">
@@ -589,7 +581,6 @@
     </div>
   </section>
 
-  <!-- 卡片 3：设置 -->
   <section class="card">
     <h2 class="card-title">⚙️ 设置</h2>
     <div class="controls">
