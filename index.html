@@ -74,7 +74,6 @@
     --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #103247 0%, transparent 62%);
     --bg-base: #07070f;
 
-    /* 更暗的卡片底色：低亮度 + 较高不透明度，形成明显的“暗片”隔离 */
     --card-bg: rgba(8, 9, 18, .78);
     --card-border: rgba(255, 255, 255, .14);
     --card-shadow: 0 20px 56px rgba(0, 0, 0, .55),
@@ -464,23 +463,24 @@
       gap: 3px;
     }
 
+    /* 年龄计时只剩「年」「天」两项 */
     .age-countdown {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
     .age-countdown .unit {
       min-width: 0;
       width: auto;
-      padding: 10px 4px 9px;
-      border-radius: 12px;
+      padding: 14px 6px 12px;
+      border-radius: 14px;
     }
     .age-countdown .num {
-      font-size: clamp(19px, 5.6vw, 26px);
+      font-size: clamp(28px, 9vw, 40px);
     }
     .age-countdown .label {
-      margin-top: 6px;
-      font-size: 11.5px;
+      margin-top: 7px;
+      font-size: 13px;
     }
 
     .controls {
@@ -528,10 +528,10 @@
     .countdown .num { font-size: clamp(26px, 8.6vw, 34px); }
     .label { font-size: 12px; }
 
-    .age-countdown { gap: 5px; }
-    .age-countdown .unit { padding: 8px 3px 7px; border-radius: 10px; }
-    .age-countdown .num { font-size: clamp(17px, 5.2vw, 22px); }
-    .age-countdown .label { font-size: 11px; }
+    .age-countdown { gap: 6px; }
+    .age-countdown .unit { padding: 12px 4px 10px; border-radius: 12px; }
+    .age-countdown .num { font-size: clamp(26px, 8.6vw, 34px); }
+    .age-countdown .label { font-size: 12px; }
 
     .meta { font-size: 12px; }
     .meta .row { padding: 7px 10px; }
@@ -575,9 +575,6 @@
     <div class="age-countdown">
       <div class="unit"><span class="num" id="ageYears">--</span><span class="label">年</span></div>
       <div class="unit"><span class="num" id="ageDays">--</span><span class="label">天</span></div>
-      <div class="unit"><span class="num" id="ageHours">--</span><span class="label">时</span></div>
-      <div class="unit"><span class="num" id="ageMinutes">--</span><span class="label">分</span></div>
-      <div class="unit"><span class="num" id="ageSeconds">--</span><span class="label">秒</span></div>
     </div>
   </section>
 
@@ -861,7 +858,7 @@
   function getAgeInfo(nowMs, tz) {
     const birthTs = getBirthTimestamp(tz);
     if (nowMs < birthTs) {
-      return { years: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+      return { years: 0, days: 0 };
     }
     const p = getParts(new Date(nowMs), tz);
     let annYear = p.year;
@@ -876,10 +873,7 @@
     const totalSec = Math.floor(Math.max(0, nowMs - annTs) / 1000);
     return {
       years: years,
-      days: Math.floor(totalSec / 86400),
-      hours: Math.floor((totalSec % 86400) / 3600),
-      minutes: Math.floor((totalSec % 3600) / 60),
-      seconds: totalSec % 60
+      days: Math.floor(totalSec / 86400)
     };
   }
 
@@ -971,12 +965,10 @@
         nextAge >= 1 ? `下次生日时将满 ${nextAge} 岁` : '');
     }
 
+    /* 年龄计时只更新年和天 */
     const age = getAgeInfo(now, currentTz);
     setText('ageYears', age.years);
     setText('ageDays', age.days);
-    setText('ageHours', pad2(age.hours));
-    setText('ageMinutes', pad2(age.minutes));
-    setText('ageSeconds', pad2(age.seconds));
   }
 
   let timerId = null;
