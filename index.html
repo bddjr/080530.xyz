@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#eef1f8" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#07070f" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="preload" as="font" type="font/woff2" href="./fonts/HarmonyOS_Sans_SC_Regular-subset.woff2" crossorigin>
+<title>距离下一个生日倒计时 · 年龄计时</title>
+
+<script>
+(function () {
+  var THEME_KEY = 'birthday-theme-mode';
+  var mode = 'system';
+  try {
+    var stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') mode = stored;
+  } catch (e) {}
+  var eff = mode;
+  if (mode === 'system') {
+    eff = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ? 'dark' : 'light';
+  }
+  document.documentElement.dataset.theme = eff;
+  document.documentElement.dataset.themeMode = mode;
+})();
+</script>
+
+<style>
+  @font-face {
+    font-family: "HarmonyOS Sans SC";
+    src: url("./fonts/HarmonyOS_Sans_SC_Regular-subset.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root,
+  html[data-theme="light"] {
+    color-scheme: light;
+    --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #dde4ff 0%, transparent 62%);
+    --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #cfeaff 0%, transparent 62%);
+    --bg-base: #eef1f8;
+    --card-bg: rgba(255, 255, 255, .72);
+    --card-border: rgba(20, 30, 60, .1);
+    --card-shadow: 0 20px 56px rgba(40, 60, 120, .14);
+    --line: rgba(20, 30, 60, .1);
+    --text: #1a1d2e;
+    --muted: #5a6178;
+    --subtitle-b: #2d3c8a;
+    --flag-color: #b07d00;
+    --unit-bg: rgba(255, 255, 255, .72);
+    --unit-border: rgba(20, 30, 60, .08);
+    --num-color: #1a1d2e;
+    --age-num-color: #b07d00;
+    --meta-row-bg: rgba(255, 255, 255, .6);
+    --meta-row-border: rgba(20, 30, 60, .07);
+    --select-bg: rgba(255, 255, 255, .85);
+    --select-option-bg: #ffffff;
+    --select-option-text: #1a1d2e;
+    --select-arrow: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%235a6178' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --focus-color: #3d5afe;
+    --focus-ring: rgba(61, 90, 254, .25);
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #2b1055 0%, transparent 62%);
+    --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #103247 0%, transparent 62%);
+    --bg-base: #07070f;
+    --card-bg: rgba(255, 255, 255, .06);
+    --card-border: rgba(255, 255, 255, .12);
+    --card-shadow: 0 20px 56px rgba(0, 0, 0, .45);
+    --line: rgba(255, 255, 255, .12);
+    --text: #eef1ff;
+    --muted: #9aa4c7;
+    --subtitle-b: #cdd8ff;
+    --flag-color: #ffd479;
+    --unit-bg: rgba(255, 255, 255, .07);
+    --unit-border: rgba(255, 255, 255, .1);
+    --num-color: #ffffff;
+    --age-num-color: #ffd479;
+    --meta-row-bg: rgba(255, 255, 255, .04);
+    --meta-row-border: rgba(255, 255, 255, .07);
+    --select-bg: rgba(255, 255, 255, .08);
+    --select-option-bg: #16162a;
+    --select-option-text: #eef1ff;
+    --select-arrow: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%239aa4c7' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --focus-color: #6f8dff;
+    --focus-ring: rgba(111, 141, 255, .25);
+  }
+
+  :root {
+    --font-sans: "HarmonyOS Sans SC",
+                 -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                 "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    height: 100%;
+    overflow-x: hidden;
+    background: var(--bg-base);
+  }
+
+  body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding:
+      max(28px, env(safe-area-inset-top, 0px))
+      max(24px, env(safe-area-inset-right, 0px))
+      max(28px, env(safe-area-inset-bottom, 0px))
+      max(24px, env(safe-area-inset-left, 0px));
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    background: transparent;
+    transition: color .25s ease;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      var(--bg-grad-1),
+      var(--bg-grad-2),
+      var(--bg-base);
+  }
+
+  /* ============================================================
+   * 卡片堆叠容器
+   * ============================================================ */
+  .stack {
+    width: 100%;
+    max-width: 720px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 28px 26px;
+    border-radius: 22px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    text-align: center;
+    transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .card-title {
+    margin: 0 0 16px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .3px;
+    color: var(--muted);
+  }
+
+  /* ============================================================
+   * 卡片 1：下一个生日
+   * ============================================================ */
+  .birthday-banner {
+    display: none;
+    margin: 0 0 18px;
+    padding: 15px 12px;
+    border-radius: 14px;
+    font-size: 21px;
+    font-weight: 800;
+    color: #3a1d00;
+    background: linear-gradient(135deg, #ffe884, #ffbe3d 55%, #ff8fa3);
+    box-shadow: 0 12px 34px rgba(255, 179, 71, .35),
+                inset 0 0 0 1px rgba(255, 255, 255, .35);
+    animation: bannerPop .5s ease both;
+  }
+  .birthday-banner.show { display: block; }
+  @keyframes bannerPop {
+    from { transform: translateY(-6px) scale(.97); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .subtitle b { color: var(--subtitle-b); font-weight: 600; }
+
+  .birthday-flag {
+    margin-top: 12px;
+    font-size: 15px;
+    color: var(--flag-color);
+    min-height: 22px;
+  }
+
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 22px 0 20px;
+  }
+  .unit {
+    min-width: 100px;
+    padding: 16px 12px 13px;
+    border-radius: 18px;
+    background: var(--unit-bg);
+    border: 1px solid var(--unit-border);
+    transition: background-color .25s ease, border-color .25s ease;
+  }
+  .num {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    color: var(--num-color);
+  }
+  .label {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 auto;
+    max-width: 560px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .meta .row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--meta-row-bg);
+    border: 1px solid var(--meta-row-border);
+    text-align: left;
+    transition: background-color .25s ease, border-color .25s ease;
+  }
+  .meta .v {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    text-align: left;
+    word-break: break-word;
+  }
+
+  /* ============================================================
+   * 卡片 2：年龄计时
+   * ============================================================ */
+  .age-countdown {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .age-countdown .unit {
+    min-width: 82px;
+    padding: 13px 8px 11px;
+  }
+  .age-countdown .num {
+    font-size: 34px;
+    letter-spacing: -0.01em;
+    color: var(--age-num-color);
+  }
+  .age-countdown .label {
+    margin-top: 7px;
+    font-size: 12.5px;
+    letter-spacing: 0;
+  }
+
+  /* ============================================================
+   * 卡片 3：设置
+   * ============================================================ */
+  .controls {
+    display: grid;
+    grid-template-columns: 1.1fr 1.7fr 0.9fr auto;
+    align-items: end;
+    gap: 14px 16px;
+    text-align: left;
+  }
+  .ctrl {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+  }
+  .ctrl label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* 输入控件基础样式（select / date / 按钮共用） */
+  select,
+  input[type="date"],
+  .btn {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background-color: var(--select-bg);
+    color: var(--text);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    cursor: pointer;
+    outline: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s,
+                background-color .25s ease, color .25s ease,
+                transform .1s ease;
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 34px;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input[type="date"]::-webkit-datetime-edit { color: var(--text); }
+
+  select:focus,
+  input[type="date"]:focus,
+  .btn:focus-visible {
+    border-color: var(--focus-color);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  select option {
+    background: var(--select-option-bg);
+    color: var(--select-option-text);
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .8;
+    transition: opacity .15s ease;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  /* 按钮（重置） */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    background-image: none;
+  }
+  .btn:hover {
+    border-color: var(--focus-color);
+    color: var(--focus-color);
+  }
+  .btn:active { transform: translateY(1px); }
+
+  /* ============================================================
+   * 响应式
+   * ============================================================ */
+  @media (min-width: 561px) and (max-width: 760px) {
+    .controls {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    body {
+      padding:
+        max(24px, env(safe-area-inset-top, 0px))
+        max(16px, env(safe-area-inset-right, 0px))
+        max(24px, env(safe-area-inset-bottom, 0px))
+        max(16px, env(safe-area-inset-left, 0px));
+    }
+
+    .stack { gap: 12px; }
+
+    .card {
+      padding: 22px 16px;
+      border-radius: 18px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .birthday-banner {
+      margin-bottom: 16px;
+      padding: 12px 10px;
+      font-size: 18px;
+      border-radius: 12px;
+    }
+
+    h1 { font-size: 20px; }
+    .subtitle { font-size: 13px; }
+    .birthday-flag { font-size: 13.5px; margin-top: 10px; }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 20px 0 18px;
+    }
+    .countdown .unit {
+      min-width: 0;
+      width: auto;
+      padding: 12px 4px 11px;
+      border-radius: 14px;
+    }
+    .countdown .num {
+      font-size: clamp(28px, 9vw, 40px);
+      letter-spacing: -0.02em;
+    }
+    .label {
+      margin-top: 7px;
+      font-size: 13px;
+    }
+
+    .meta {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .meta .row {
+      padding: 9px 12px;
+      gap: 3px;
+    }
+
+    .age-countdown {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .age-countdown .unit {
+      min-width: 0;
+      width: auto;
+      padding: 10px 4px 9px;
+      border-radius: 12px;
+    }
+    .age-countdown .num {
+      font-size: clamp(19px, 5.6vw, 26px);
+    }
+    .age-countdown .label {
+      margin-top: 6px;
+      font-size: 11.5px;
+    }
+
+    .controls {
+      grid-template-columns: 1fr auto;
+      gap: 10px 12px;
+      align-items: end;
+    }
+    .ctrl { gap: 5px; }
+    .ctrl:nth-child(1),
+    .ctrl:nth-child(2) {
+      grid-column: 1 / -1;
+    }
+    .ctrl label { font-size: 12px; }
+
+    select,
+    input[type="date"],
+    .btn {
+      min-height: 44px;
+      padding: 11px 12px;
+      font-size: 16px;
+      border-radius: 11px;
+    }
+    select {
+      padding-right: 32px;
+      background-position: right 12px center;
+    }
+
+    .btn { min-width: 92px; padding: 11px 16px; }
+  }
+
+  @media (max-width: 360px) {
+    body {
+      padding-top: max(20px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    }
+
+    .stack { gap: 10px; }
+
+    .card { padding: 18px 12px; border-radius: 16px; }
+    .birthday-banner { font-size: 16px; }
+    h1 { font-size: 18px; }
+
+    .countdown { gap: 6px; margin: 16px 0 14px; }
+    .countdown .unit { padding: 10px 3px 9px; border-radius: 12px; }
+    .countdown .num { font-size: clamp(26px, 8.6vw, 34px); }
+    .label { font-size: 12px; }
+
+    .age-countdown { gap: 5px; }
+    .age-countdown .unit { padding: 8px 3px 7px; border-radius: 10px; }
+    .age-countdown .num { font-size: clamp(17px, 5.2vw, 22px); }
+    .age-countdown .label { font-size: 11px; }
+
+    .meta { font-size: 12px; }
+    .meta .row { padding: 7px 10px; }
+  }
+
+  @media (max-height: 520px) and (orientation: landscape) {
+    body {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    .stack { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stack">
+
+  <!-- 卡片 1：下一个生日 -->
+  <section class="card">
+    <div class="birthday-banner" id="birthdayBanner">🎉 生日快乐！</div>
+
+    <h1>🎂 距离下一个生日</h1>
+    <div class="subtitle">生日：<b id="birthText">2008 年 5 月 30 日</b></div>
+    <div class="birthday-flag" id="flag"></div>
+
+    <div class="countdown">
+      <div class="unit"><span class="num" id="days">--</span><span class="label">天</span></div>
+      <div class="unit"><span class="num" id="hours">--</span><span class="label">时</span></div>
+      <div class="unit"><span class="num" id="minutes">--</span><span class="label">分</span></div>
+      <div class="unit"><span class="num" id="seconds">--</span><span class="label">秒</span></div>
+    </div>
+
+    <div class="meta">
+      <div class="row"><span>下次生日</span><span class="v" id="nextDate">--</span></div>
+      <div class="row"><span>当前时间</span><span class="v" id="nowText">--</span></div>
+    </div>
+  </section>
+
+  <!-- 卡片 2：年龄计时 -->
+  <section class="card">
+    <h2 class="card-title">⏳ 年龄计时</h2>
+    <div class="age-countdown">
+      <div class="unit"><span class="num" id="ageYears">--</span><span class="label">年</span></div>
+      <div class="unit"><span class="num" id="ageDays">--</span><span class="label">天</span></div>
+      <div class="unit"><span class="num" id="ageHours">--</span><span class="label">时</span></div>
+      <div class="unit"><span class="num" id="ageMinutes">--</span><span class="label">分</span></div>
+      <div class="unit"><span class="num" id="ageSeconds">--</span><span class="label">秒</span></div>
+    </div>
+  </section>
+
+  <!-- 卡片 3：设置 -->
+  <section class="card">
+    <h2 class="card-title">⚙️ 设置</h2>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="birthday">生日</label>
+        <input type="date" id="birthday" />
+      </div>
+      <div class="ctrl">
+        <label for="tz">时区</label>
+        <select id="tz"></select>
+      </div>
+      <div class="ctrl">
+        <label for="theme">主题</label>
+        <select id="theme">
+          <option value="system">跟随系统</option>
+          <option value="light">亮色</option>
+          <option value="dark">暗色</option>
+        </select>
+      </div>
+      <div class="ctrl">
+        <label>&nbsp;</label>
+        <button type="button" id="reset" class="btn">重置</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const DEFAULT_BIRTH = { year: 2008, month: 5, day: 30 };
+  const DEFAULT_TZ = 'Asia/Shanghai';
+  const BIRTH_KEY = 'birthday-date';
+  const THEME_KEY = 'birthday-theme-mode';
+
+  const FALLBACK_TZ_LIST = [
+    'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Taipei', 'Asia/Singapore',
+    'Asia/Tokyo', 'Asia/Seoul', 'Asia/Bangkok', 'Asia/Kolkata',
+    'Asia/Dubai', 'Europe/Moscow', 'Europe/Berlin', 'Europe/Paris',
+    'Europe/London', 'America/Sao_Paulo', 'America/New_York',
+    'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+    'Australia/Sydney', 'Pacific/Auckland', 'UTC'
+  ];
+
+  const partsFmtCache = new Map();
+  const weekdayFmtCache = new Map();
+
+  function partsFormatter(tz) {
+    let f = partsFmtCache.get(tz);
+    if (!f) {
+      f = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      partsFmtCache.set(tz, f);
+    }
+    return f;
+  }
+  function weekdayFormatter(tz) {
+    let f = weekdayFmtCache.get(tz);
+    if (!f) {
+      f = new Intl.DateTimeFormat('zh-CN', { timeZone: tz, weekday: 'long' });
+      weekdayFmtCache.set(tz, f);
+    }
+    return f;
+  }
+  function getParts(date, tz) {
+    const raw = {};
+    for (const p of partsFormatter(tz).formatToParts(date)) {
+      if (p.type !== 'literal') raw[p.type] = p.value;
+    }
+    let hour = parseInt(raw.hour, 10);
+    if (hour === 24) hour = 0;
+    return {
+      year: parseInt(raw.year, 10),
+      month: parseInt(raw.month, 10),
+      day: parseInt(raw.day, 10),
+      hour: hour,
+      minute: parseInt(raw.minute, 10),
+      second: parseInt(raw.second, 10)
+    };
+  }
+  function getOffsetMinutes(tz, date) {
+    const p = getParts(date, tz);
+    const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+    const actual = Math.floor(date.getTime() / 1000) * 1000;
+    return Math.round((asUTC - actual) / 60000);
+  }
+  function zonedTimeToTimestamp(y, mo, d, h, mi, s, tz) {
+    const naive = Date.UTC(y, mo - 1, d, h, mi, s);
+    let ts = naive;
+    for (let i = 0; i < 3; i++) {
+      const off = getOffsetMinutes(tz, new Date(ts));
+      const next = naive - off * 60000;
+      if (next === ts) break;
+      ts = next;
+    }
+    return ts;
+  }
+
+  function computeTzOffsets(tz, now) {
+    const offsets = [];
+    const y = now.getUTCFullYear();
+    const m = now.getUTCMonth();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(Date.UTC(y, m + i, 1));
+      offsets.push(getOffsetMinutes(tz, d));
+    }
+    return offsets;
+  }
+
+  function getSupportedTimeZones() {
+    const list = [];
+    const seen = new Set();
+    const push = (tz) => {
+      if (!tz || seen.has(tz)) return;
+      try { getOffsetMinutes(tz, new Date()); } catch (e) { return; }
+      seen.add(tz);
+      list.push(tz);
+    };
+
+    push(DEFAULT_TZ);
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    push(localTz);
+
+    let source = FALLBACK_TZ_LIST;
+    if (typeof Intl.supportedValuesOf === 'function') {
+      try {
+        const all = Intl.supportedValuesOf('timeZone');
+        if (Array.isArray(all) && all.length > 0) source = all;
+      } catch (e) {}
+    }
+
+    for (const tz of source) {
+      if (tz.startsWith('Etc/GMT') && tz !== 'Etc/GMT') continue;
+      push(tz);
+    }
+
+    push('UTC');
+    push('Etc/UTC');
+    push('Etc/GMT');
+
+    return list;
+  }
+
+  let tzGroups = [];
+
+  function buildTzGroups() {
+    const now = new Date();
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const allZones = getSupportedTimeZones();
+
+    const sigMap = new Map();
+    for (const tz of allZones) {
+      const offsets = computeTzOffsets(tz, now);
+      const sig = offsets.join(',');
+      const hasDST = new Set(offsets).size > 1;
+      let g = sigMap.get(sig);
+      if (!g) {
+        g = {
+          offset: getOffsetMinutes(tz, now),
+          hasDST: hasDST,
+          zones: []
+        };
+        sigMap.set(sig, g);
+      }
+      g.zones.push(tz);
+    }
+
+    const rank = (tz) => tz === DEFAULT_TZ ? 0 : tz === localTz ? 1 : 2;
+    for (const g of Array.from(sigMap.values())) {
+      g.zones.sort((a, b) => {
+        const ra = rank(a), rb = rank(b);
+        if (ra !== rb) return ra - rb;
+        return a.localeCompare(b);
+      });
+      g.rep = g.zones[0];
+    }
+
+    tzGroups = Array.from(sigMap.values()).sort((a, b) => b.offset - a.offset);
+  }
+
+  function shortTzName(tz) {
+    if (tz === 'UTC' || tz === 'Etc/UTC' || tz === 'Etc/GMT') return 'UTC';
+    const prefixes = ['Asia/', 'Europe/', 'America/', 'Australia/', 'Pacific/',
+                      'Africa/', 'Atlantic/', 'Indian/', 'Arctic/', 'Antarctica/'];
+    for (const p of prefixes) {
+      if (tz.startsWith(p)) return tz.slice(p.length);
+    }
+    return tz;
+  }
+
+  function formatOffset(minutes) {
+    const sign = minutes >= 0 ? '+' : '-';
+    const abs = Math.abs(minutes);
+    const h = String(Math.floor(abs / 60)).padStart(2, '0');
+    const m = String(abs % 60).padStart(2, '0');
+    return `UTC${sign}${h}:${m}`;
+  }
+
+  function groupLabel(g) {
+    const offLabel = formatOffset(g.offset);
+    const dstMark = g.hasDST ? '☀️ 夏令时 · ' : '';
+    const names = g.zones.map(shortTzName);
+    const MAX = 4;
+    const shown = names.slice(0, MAX);
+    const extra = names.length - shown.length;
+    const nameStr = extra > 0
+      ? `${shown.join(' / ')} 等 ${names.length} 个地区`
+      : shown.join(' / ');
+    return `${offLabel} · ${dstMark}${nameStr}`;
+  }
+
+  function fullGroupLabel(g) {
+    const dstMark = g.hasDST ? ' ☀️ 含夏令时' : '';
+    return `${formatOffset(g.offset)}${dstMark} · ${g.zones.map(shortTzName).join(' / ')}`;
+  }
+
+  function daysInMonth(year, month) {
+    return new Date(Date.UTC(year, month, 0)).getUTCDate();
+  }
+  function clampedDay(year, month, day) {
+    return Math.min(day, daysInMonth(year, month));
+  }
+  function isValidDate(y, m, d) {
+    if (!Number.isInteger(y) || y < 1 || y > 9999) return false;
+    if (!Number.isInteger(m) || m < 1 || m > 12) return false;
+    if (!Number.isInteger(d) || d < 1 || d > daysInMonth(y, m)) return false;
+    return true;
+  }
+
+  let BIRTH = { ...DEFAULT_BIRTH };
+
+  function loadBirthFromStorage() {
+    try {
+      const s = localStorage.getItem(BIRTH_KEY);
+      if (!s) return false;
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+      if (!m) return false;
+      const y = +m[1], mo = +m[2], d = +m[3];
+      if (!isValidDate(y, mo, d)) return false;
+      BIRTH = { year: y, month: mo, day: d };
+      return true;
+    } catch (e) { return false; }
+  }
+  function saveBirthToStorage() {
+    try {
+      localStorage.setItem(BIRTH_KEY,
+        `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`);
+    } catch (e) {}
+  }
+  function clearBirthStorage() {
+    try { localStorage.removeItem(BIRTH_KEY); } catch (e) {}
+  }
+
+  function getNextBirthdayTimestamp(nowMs, tz) {
+    const p = getParts(new Date(nowMs), tz);
+    let year = p.year;
+    let day = clampedDay(year, BIRTH.month, BIRTH.day);
+    let ts = zonedTimeToTimestamp(year, BIRTH.month, day, 0, 0, 0, tz);
+    if (ts <= nowMs) {
+      year += 1;
+      day = clampedDay(year, BIRTH.month, BIRTH.day);
+      ts = zonedTimeToTimestamp(year, BIRTH.month, day, 0, 0, 0, tz);
+    }
+    return ts;
+  }
+  function getBirthTimestamp(tz) {
+    return zonedTimeToTimestamp(
+      BIRTH.year, BIRTH.month,
+      clampedDay(BIRTH.year, BIRTH.month, BIRTH.day),
+      0, 0, 0, tz
+    );
+  }
+  function getAgeInfo(nowMs, tz) {
+    const birthTs = getBirthTimestamp(tz);
+    if (nowMs < birthTs) {
+      return { years: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+    const p = getParts(new Date(nowMs), tz);
+    let annYear = p.year;
+    let annDay = clampedDay(annYear, BIRTH.month, BIRTH.day);
+    let annTs = zonedTimeToTimestamp(annYear, BIRTH.month, annDay, 0, 0, 0, tz);
+    if (annTs > nowMs) {
+      annYear -= 1;
+      annDay = clampedDay(annYear, BIRTH.month, BIRTH.day);
+      annTs = zonedTimeToTimestamp(annYear, BIRTH.month, annDay, 0, 0, 0, tz);
+    }
+    const years = Math.max(0, annYear - BIRTH.year);
+    const totalSec = Math.floor(Math.max(0, nowMs - annTs) / 1000);
+    return {
+      years: years,
+      days: Math.floor(totalSec / 86400),
+      hours: Math.floor((totalSec % 86400) / 3600),
+      minutes: Math.floor((totalSec % 3600) / 60),
+      seconds: totalSec % 60
+    };
+  }
+
+  const pad2 = n => String(n).padStart(2, '0');
+
+  function formatFullDateTime(ts, tz) {
+    const d = new Date(ts);
+    const p = getParts(d, tz);
+    const wd = weekdayFormatter(tz).format(d);
+    return `${p.year}-${pad2(p.month)}-${pad2(p.day)} ` +
+           `${wd} ` +
+           `${pad2(p.hour)}:${pad2(p.minute)}:${pad2(p.second)}`;
+  }
+
+  const $ = id => document.getElementById(id);
+  const tzSelect = $('tz');
+  const themeSelect = $('theme');
+  const birthdayInput = $('birthday');
+  const bannerEl = $('birthdayBanner');
+  const resetBtn = $('reset');
+
+  function setText(id, value) {
+    const node = $(id);
+    const s = String(value);
+    if (node.textContent !== s) node.textContent = s;
+  }
+  function updateBirthLabel() {
+    setText('birthText', `${BIRTH.year} 年 ${BIRTH.month} 月 ${BIRTH.day} 日`);
+  }
+
+  function buildTimezoneSelect() {
+    tzSelect.innerHTML = '';
+    buildTzGroups();
+    for (const g of tzGroups) {
+      const opt = document.createElement('option');
+      opt.value = g.rep;
+      opt.textContent = groupLabel(g);
+      opt.title = fullGroupLabel(g);
+      tzSelect.appendChild(opt);
+    }
+  }
+
+  function setTz(tz) {
+    const g = tzGroups.find(g => g.zones.includes(tz));
+    const rep = g ? g.rep : (tzGroups[0] ? tzGroups[0].rep : DEFAULT_TZ);
+    currentTz = rep;
+    if (tzSelect.value !== rep) tzSelect.value = rep;
+  }
+
+  let currentTz = DEFAULT_TZ;
+  let targetTs = null;
+
+  function refreshTarget() {
+    targetTs = getNextBirthdayTimestamp(Date.now(), currentTz);
+    setText('nextDate', formatFullDateTime(targetTs, currentTz));
+  }
+
+  function render() {
+    const now = Date.now();
+    if (targetTs === null || now >= targetTs) refreshTarget();
+
+    const diff = Math.max(0, targetTs - now);
+    const totalSec = Math.floor(diff / 1000);
+    setText('days', Math.floor(totalSec / 86400));
+    setText('hours', pad2(Math.floor((totalSec % 86400) / 3600)));
+    setText('minutes', pad2(Math.floor((totalSec % 3600) / 60)));
+    setText('seconds', pad2(totalSec % 60));
+
+    setText('nowText', formatFullDateTime(now, currentTz));
+
+    const nowDate = new Date(now);
+    const p = getParts(nowDate, currentTz);
+
+    const birthTs = getBirthTimestamp(currentTz);
+    const birthdayDay = clampedDay(p.year, BIRTH.month, BIRTH.day);
+    const isBirthdayToday =
+      now >= birthTs &&
+      p.month === BIRTH.month &&
+      p.day === birthdayDay;
+
+    bannerEl.classList.toggle('show', isBirthdayToday);
+
+    if (isBirthdayToday) {
+      setText('flag', '');
+    } else {
+      const nextYear = getParts(new Date(targetTs), currentTz).year;
+      const nextAge = nextYear - BIRTH.year;
+      setText('flag',
+        nextAge >= 1 ? `下次生日时将满 ${nextAge} 岁` : '');
+    }
+
+    const age = getAgeInfo(now, currentTz);
+    setText('ageYears', age.years);
+    setText('ageDays', age.days);
+    setText('ageHours', pad2(age.hours));
+    setText('ageMinutes', pad2(age.minutes));
+    setText('ageSeconds', pad2(age.seconds));
+  }
+
+  let timerId = null;
+  function scheduleNextTick() {
+    const delay = 1001 - (Date.now() % 1000);
+    timerId = setTimeout(tick, delay);
+  }
+  function tick() {
+    render();
+    scheduleNextTick();
+  }
+
+  const themeMql = window.matchMedia('(prefers-color-scheme: dark)');
+  let themeMode = document.documentElement.dataset.themeMode || 'system';
+
+  function resolveEffectiveTheme(mode) {
+    if (mode === 'system') return themeMql.matches ? 'dark' : 'light';
+    return mode;
+  }
+  function applyTheme() {
+    const effective = resolveEffectiveTheme(themeMode);
+    document.documentElement.dataset.theme = effective;
+    document.documentElement.dataset.themeMode = themeMode;
+    if (themeSelect.value !== themeMode) themeSelect.value = themeMode;
+  }
+
+  themeSelect.addEventListener('change', function () {
+    themeMode = themeSelect.value;
+    try { localStorage.setItem(THEME_KEY, themeMode); } catch (e) {}
+    applyTheme();
+  });
+
+  function onSystemThemeChange() {
+    if (themeMode === 'system') applyTheme();
+  }
+  if (themeMql.addEventListener) themeMql.addEventListener('change', onSystemThemeChange);
+  else if (themeMql.addListener) themeMql.addListener(onSystemThemeChange);
+
+  tzSelect.addEventListener('change', function () {
+    currentTz = tzSelect.value;
+    refreshTarget();
+    render();
+  });
+
+  birthdayInput.addEventListener('change', function () {
+    const v = birthdayInput.value;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+    if (!m) return;
+    const y = +m[1], mo = +m[2], d = +m[3];
+    if (!isValidDate(y, mo, d)) return;
+    BIRTH = { year: y, month: mo, day: d };
+    saveBirthToStorage();
+    updateBirthLabel();
+    refreshTarget();
+    render();
+  });
+
+  resetBtn.addEventListener('click', function () {
+    BIRTH = { ...DEFAULT_BIRTH };
+    clearBirthStorage();
+    birthdayInput.value = `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`;
+    updateBirthLabel();
+
+    setTz(DEFAULT_TZ);
+
+    themeMode = 'system';
+    try { localStorage.removeItem(THEME_KEY); } catch (e) {}
+    applyTheme();
+
+    refreshTarget();
+    render();
+  });
+
+  loadBirthFromStorage();
+  birthdayInput.value = `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`;
+  updateBirthLabel();
+
+  buildTimezoneSelect();
+  setTz(DEFAULT_TZ);
+
+  applyTheme();
+  refreshTarget();
+  render();
+  scheduleNextTick();
+})();
+</script>
+</body>
+</html>
