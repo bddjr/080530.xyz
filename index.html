@@ -10,24 +10,6 @@
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <title>距离下一个生日倒计时 · 年龄计时</title>
 
-<script>
-(function () {
-  var THEME_KEY = 'birthday-theme-mode';
-  var mode = 'system';
-  try {
-    var stored = localStorage.getItem(THEME_KEY);
-    if (stored === 'light' || stored === 'dark' || stored === 'system') mode = stored;
-  } catch (e) {}
-  var eff = mode;
-  if (mode === 'system') {
-    eff = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-      ? 'dark' : 'light';
-  }
-  document.documentElement.dataset.theme = eff;
-  document.documentElement.dataset.themeMode = mode;
-})();
-</script>
-
 <style>
   @font-face {
     font-family: "HarmonyOS Sans SC";
@@ -150,14 +132,16 @@
   .stack {
     width: 100%;
     max-width: 720px;
+    min-width: 0;
     margin: auto;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
 
   .card {
     width: 100%;
+    min-width: 0;          /* 防止长文本把 grid item 撑出视口 */
     padding: 28px 26px;
     border-radius: 22px;
     background: var(--card-bg);
@@ -165,6 +149,9 @@
     box-shadow: var(--card-shadow);
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     text-align: center;
     transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
   }
@@ -215,15 +202,16 @@
   }
 
   .countdown {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
-    flex-wrap: wrap;
+    width: 100%;
     margin: 22px 0 20px;
   }
   .unit {
-    min-width: 100px;
-    padding: 16px 12px 13px;
+    min-width: 0;
+    width: 100%;
+    padding: 16px 8px 13px;
     border-radius: 18px;
     background: var(--unit-bg);
     border: 1px solid var(--unit-border);
@@ -233,8 +221,8 @@
     display: block;
     font-family: var(--font-sans);
     font-weight: 400;
-    font-size: 48px;
-    line-height: 1;
+    font-size: clamp(38px, 7vw, 56px);
+    line-height: 1.05;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
@@ -253,6 +241,8 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+    width: 100%;
+    min-width: 0;
     margin: 0 auto;
     max-width: 560px;
     font-size: 14px;
@@ -263,6 +253,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+    min-width: 0;
     padding: 10px 14px;
     border-radius: 12px;
     background: var(--meta-row-bg);
@@ -271,6 +262,7 @@
     transition: background-color .25s ease, border-color .25s ease;
   }
   .meta .v {
+    min-width: 0;
     color: var(--text);
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
@@ -279,31 +271,31 @@
   }
 
   .age-countdown {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
   }
   .age-countdown .unit {
-    min-width: 82px;
-    padding: 13px 8px 11px;
+    padding: 16px 8px 14px;
   }
   .age-countdown .num {
-    font-size: 34px;
+    font-size: clamp(34px, 5vw, 46px);
     letter-spacing: -0.01em;
     color: var(--age-num-color);
   }
   .age-countdown .label {
     margin-top: 7px;
-    font-size: 12.5px;
+    font-size: 13px;
     letter-spacing: 0;
   }
 
   .controls {
     display: grid;
-    grid-template-columns: 1.1fr 1.7fr 0.9fr auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: end;
     gap: 14px 16px;
+    width: 100%;
     text-align: left;
   }
   .ctrl {
@@ -394,9 +386,32 @@
   }
   .btn:active { transform: translateY(1px); }
 
-  @media (min-width: 561px) and (max-width: 760px) {
+  /* 宽屏：主卡独占一行，「年龄计时」与「设置」并排，减少纵向留白 */
+  @media (min-width: 761px) {
+    .stack {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+    .stack > .card:first-child {
+      grid-column: 1 / -1;
+    }
+    .stack > .card:not(:first-child) {
+      padding: 22px 20px;
+    }
+    .age-countdown .num {
+      font-size: clamp(38px, 4vw, 48px);
+    }
+    .age-countdown .unit {
+      padding: 22px 8px;
+    }
     .controls {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px 14px;
+    }
+    /* 并排后卡片变窄：生日、时区各占整行，下拉标签不再被截断 */
+    .ctrl:nth-child(1),
+    .ctrl:nth-child(2) {
+      grid-column: 1 / -1;
     }
   }
 
@@ -433,14 +448,10 @@
     .birthday-flag { font-size: 13.5px; margin-top: 10px; }
 
     .countdown {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       margin: 20px 0 18px;
     }
     .countdown .unit {
-      min-width: 0;
-      width: auto;
       padding: 12px 4px 11px;
       border-radius: 14px;
     }
@@ -459,19 +470,15 @@
       font-size: 13px;
     }
     .meta .row {
-      padding: 9px 12px;
       gap: 3px;
+      padding: 9px 12px;
     }
 
     /* 年龄计时只剩「年」「天」两项 */
     .age-countdown {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
     .age-countdown .unit {
-      min-width: 0;
-      width: auto;
       padding: 14px 6px 12px;
       border-radius: 14px;
     }
@@ -484,7 +491,7 @@
     }
 
     .controls {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px 12px;
       align-items: end;
     }
@@ -606,14 +613,24 @@
 
 </div>
 
+
 <script>
-(function () {
-  'use strict';
+{
+  /* 主题初始化：读取偏好并落到 data-theme（脚本位于 body 末尾，DOM 已就绪） */
+  const THEME_KEY = 'birthday-theme-mode';
+  let mode = 'system';
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') mode = stored;
+  } catch (e) {}
+  const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  document.documentElement.dataset.theme = mode === 'system'
+    ? (mql && mql.matches ? 'dark' : 'light') : mode;
+  document.documentElement.dataset.themeMode = mode;
 
   const DEFAULT_BIRTH = { year: 2008, month: 5, day: 30 };
   const DEFAULT_TZ = 'Asia/Shanghai';
   const BIRTH_KEY = 'birthday-date';
-  const THEME_KEY = 'birthday-theme-mode';
 
   const FALLBACK_TZ_LIST = [
     'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Taipei', 'Asia/Singapore',
@@ -624,32 +641,23 @@
     'Australia/Sydney', 'Pacific/Auckland', 'UTC'
   ];
 
+  const pad2 = n => (n > 9 ? '' + n : '0' + n);
+
   const partsFmtCache = new Map();
   const weekdayFmtCache = new Map();
 
-  function partsFormatter(tz) {
-    let f = partsFmtCache.get(tz);
-    if (!f) {
-      f = new Intl.DateTimeFormat('en-US', {
+  const getParts = (date, tz) => {
+    let fmt = partsFmtCache.get(tz);
+    if (!fmt) {
+      fmt = new Intl.DateTimeFormat('en-US', {
         timeZone: tz, hour12: false,
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit'
       });
-      partsFmtCache.set(tz, f);
+      partsFmtCache.set(tz, fmt);
     }
-    return f;
-  }
-  function weekdayFormatter(tz) {
-    let f = weekdayFmtCache.get(tz);
-    if (!f) {
-      f = new Intl.DateTimeFormat('zh-CN', { timeZone: tz, weekday: 'long' });
-      weekdayFmtCache.set(tz, f);
-    }
-    return f;
-  }
-  function getParts(date, tz) {
     const raw = {};
-    for (const p of partsFormatter(tz).formatToParts(date)) {
+    for (const p of fmt.formatToParts(date)) {
       if (p.type !== 'literal') raw[p.type] = p.value;
     }
     let hour = parseInt(raw.hour, 10);
@@ -662,108 +670,16 @@
       minute: parseInt(raw.minute, 10),
       second: parseInt(raw.second, 10)
     };
-  }
-  function getOffsetMinutes(tz, date) {
+  };
+  const getOffsetMinutes = (tz, date) => {
     const p = getParts(date, tz);
     const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
     const actual = Math.floor(date.getTime() / 1000) * 1000;
     return Math.round((asUTC - actual) / 60000);
-  }
-  function zonedTimeToTimestamp(y, mo, d, h, mi, s, tz) {
-    const naive = Date.UTC(y, mo - 1, d, h, mi, s);
-    let ts = naive;
-    for (let i = 0; i < 3; i++) {
-      const off = getOffsetMinutes(tz, new Date(ts));
-      const next = naive - off * 60000;
-      if (next === ts) break;
-      ts = next;
-    }
-    return ts;
-  }
-
-  function computeTzOffsets(tz, now) {
-    const offsets = [];
-    const y = now.getUTCFullYear();
-    const m = now.getUTCMonth();
-    for (let i = 0; i < 12; i++) {
-      const d = new Date(Date.UTC(y, m + i, 1));
-      offsets.push(getOffsetMinutes(tz, d));
-    }
-    return offsets;
-  }
-
-  function getSupportedTimeZones() {
-    const list = [];
-    const seen = new Set();
-    const push = (tz) => {
-      if (!tz || seen.has(tz)) return;
-      try { getOffsetMinutes(tz, new Date()); } catch (e) { return; }
-      seen.add(tz);
-      list.push(tz);
-    };
-
-    push(DEFAULT_TZ);
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    push(localTz);
-
-    let source = FALLBACK_TZ_LIST;
-    if (typeof Intl.supportedValuesOf === 'function') {
-      try {
-        const all = Intl.supportedValuesOf('timeZone');
-        if (Array.isArray(all) && all.length > 0) source = all;
-      } catch (e) {}
-    }
-
-    for (const tz of source) {
-      if (tz.startsWith('Etc/GMT') && tz !== 'Etc/GMT') continue;
-      push(tz);
-    }
-
-    push('UTC');
-    push('Etc/UTC');
-    push('Etc/GMT');
-
-    return list;
-  }
-
+  };
   let tzGroups = [];
 
-  function buildTzGroups() {
-    const now = new Date();
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const allZones = getSupportedTimeZones();
-
-    const sigMap = new Map();
-    for (const tz of allZones) {
-      const offsets = computeTzOffsets(tz, now);
-      const sig = offsets.join(',');
-      const hasDST = new Set(offsets).size > 1;
-      let g = sigMap.get(sig);
-      if (!g) {
-        g = {
-          offset: getOffsetMinutes(tz, now),
-          hasDST: hasDST,
-          zones: []
-        };
-        sigMap.set(sig, g);
-      }
-      g.zones.push(tz);
-    }
-
-    const rank = (tz) => tz === DEFAULT_TZ ? 0 : tz === localTz ? 1 : 2;
-    for (const g of Array.from(sigMap.values())) {
-      g.zones.sort((a, b) => {
-        const ra = rank(a), rb = rank(b);
-        if (ra !== rb) return ra - rb;
-        return a.localeCompare(b);
-      });
-      g.rep = g.zones[0];
-    }
-
-    tzGroups = Array.from(sigMap.values()).sort((a, b) => b.offset - a.offset);
-  }
-
-  function shortTzName(tz) {
+  const shortTzName = (tz) => {
     if (tz === 'UTC' || tz === 'Etc/UTC' || tz === 'Etc/GMT') return 'UTC';
     const prefixes = ['Asia/', 'Europe/', 'America/', 'Australia/', 'Pacific/',
                       'Africa/', 'Atlantic/', 'Indian/', 'Arctic/', 'Antarctica/'];
@@ -771,264 +687,206 @@
       if (tz.startsWith(p)) return tz.slice(p.length);
     }
     return tz;
-  }
+  };
 
-  function formatOffset(minutes) {
-    const sign = minutes >= 0 ? '+' : '-';
-    const abs = Math.abs(minutes);
-    const h = String(Math.floor(abs / 60)).padStart(2, '0');
-    const m = String(abs % 60).padStart(2, '0');
-    return `UTC${sign}${h}:${m}`;
-  }
-
-  function groupLabel(g) {
-    const offLabel = formatOffset(g.offset);
-    const dstMark = g.hasDST ? '☀️ 夏令时 · ' : '';
-    const names = g.zones.map(shortTzName);
-    const MAX = 4;
-    const shown = names.slice(0, MAX);
-    const extra = names.length - shown.length;
-    const nameStr = extra > 0
-      ? `${shown.join(' / ')} 等 ${names.length} 个地区`
-      : shown.join(' / ');
-    return `${offLabel} · ${dstMark}${nameStr}`;
-  }
-
-  function fullGroupLabel(g) {
-    const dstMark = g.hasDST ? ' ☀️ 含夏令时' : '';
-    return `${formatOffset(g.offset)}${dstMark} · ${g.zones.map(shortTzName).join(' / ')}`;
-  }
-
-  function daysInMonth(year, month) {
+  const daysInMonth = (year, month) => {
     return new Date(Date.UTC(year, month, 0)).getUTCDate();
-  }
-  function clampedDay(year, month, day) {
+  };
+  const clampedDay = (year, month, day) => {
     return Math.min(day, daysInMonth(year, month));
-  }
-  function isValidDate(y, m, d) {
+  };
+  const isValidDate = (y, m, d) => {
     if (!Number.isInteger(y) || y < 1 || y > 9999) return false;
     if (!Number.isInteger(m) || m < 1 || m > 12) return false;
     if (!Number.isInteger(d) || d < 1 || d > daysInMonth(y, m)) return false;
     return true;
-  }
+  };
 
+  /* ---------- 状态 ---------- */
   let BIRTH = { ...DEFAULT_BIRTH };
+  let currentTz = DEFAULT_TZ;
+  let birthTs = 0;        // 出生时刻（按当前时区），配置变化时重算
+  let targetTs = null;    // 下次生日时刻
+  let targetYear = 0;     // 下次生日所在年份
 
-  function loadBirthFromStorage() {
-    try {
-      const s = localStorage.getItem(BIRTH_KEY);
-      if (!s) return false;
-      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-      if (!m) return false;
-      const y = +m[1], mo = +m[2], d = +m[3];
-      if (!isValidDate(y, mo, d)) return false;
-      BIRTH = { year: y, month: mo, day: d };
-      return true;
-    } catch (e) { return false; }
-  }
-  function saveBirthToStorage() {
-    try {
-      localStorage.setItem(BIRTH_KEY,
-        `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`);
-    } catch (e) {}
-  }
-  function clearBirthStorage() {
-    try { localStorage.removeItem(BIRTH_KEY); } catch (e) {}
-  }
-
-  function getNextBirthdayTimestamp(nowMs, tz) {
-    const p = getParts(new Date(nowMs), tz);
-    let year = p.year;
-    let day = clampedDay(year, BIRTH.month, BIRTH.day);
-    let ts = zonedTimeToTimestamp(year, BIRTH.month, day, 0, 0, 0, tz);
-    if (ts <= nowMs) {
-      year += 1;
-      day = clampedDay(year, BIRTH.month, BIRTH.day);
-      ts = zonedTimeToTimestamp(year, BIRTH.month, day, 0, 0, 0, tz);
+  /* 生日纪念日 00:00 只取决于「年份 + 生日 + 时区」，缓存后
+     每秒的 tick 不必再重复做 Intl 时区换算。 */
+  const anniversaryCache = new Map();
+  const anniversaryTs = (year, tz) => {
+    const key = `${year}|${tz}`;
+    if (anniversaryCache.has(key)) return anniversaryCache.get(key);
+    const day = clampedDay(year, BIRTH.month, BIRTH.day);
+    const naive = Date.UTC(year, BIRTH.month - 1, day);
+    let ts = naive;
+    for (let i = 0; i < 3; i++) {
+      const off = getOffsetMinutes(tz, new Date(ts));
+      const next = naive - off * 60000;
+      if (next === ts) break;
+      ts = next;
     }
+    anniversaryCache.set(key, ts);
     return ts;
-  }
-  function getBirthTimestamp(tz) {
-    return zonedTimeToTimestamp(
-      BIRTH.year, BIRTH.month,
-      clampedDay(BIRTH.year, BIRTH.month, BIRTH.day),
-      0, 0, 0, tz
-    );
-  }
-  function getAgeInfo(nowMs, tz) {
-    const birthTs = getBirthTimestamp(tz);
-    if (nowMs < birthTs) {
-      return { years: 0, days: 0 };
-    }
-    const p = getParts(new Date(nowMs), tz);
-    let annYear = p.year;
-    let annDay = clampedDay(annYear, BIRTH.month, BIRTH.day);
-    let annTs = zonedTimeToTimestamp(annYear, BIRTH.month, annDay, 0, 0, 0, tz);
-    if (annTs > nowMs) {
-      annYear -= 1;
-      annDay = clampedDay(annYear, BIRTH.month, BIRTH.day);
-      annTs = zonedTimeToTimestamp(annYear, BIRTH.month, annDay, 0, 0, 0, tz);
-    }
-    const years = Math.max(0, annYear - BIRTH.year);
-    const totalSec = Math.floor(Math.max(0, nowMs - annTs) / 1000);
-    return {
-      years: years,
-      days: Math.floor(totalSec / 86400)
-    };
-  }
+  };
 
-  const pad2 = n => String(n).padStart(2, '0');
+  /* 生日或时区变化后统一失效所有派生锚点 */
+  const invalidateAnchors = () => {
+    anniversaryCache.clear();
+    birthTs = anniversaryTs(BIRTH.year, currentTz);
+    targetTs = null;   // 由下一次 render 用同一时刻重算
+  };
 
-  function formatFullDateTime(ts, tz) {
-    const d = new Date(ts);
-    const p = getParts(d, tz);
-    const wd = weekdayFormatter(tz).format(d);
+  const formatFullDateTime = (date, tz, parts) => {
+    const p = parts || getParts(date, tz);
+    let wdFmt = weekdayFmtCache.get(tz);
+    if (!wdFmt) {
+      wdFmt = new Intl.DateTimeFormat('zh-CN', { timeZone: tz, weekday: 'long' });
+      weekdayFmtCache.set(tz, wdFmt);
+    }
     return `${p.year}-${pad2(p.month)}-${pad2(p.day)} ` +
-           `${wd} ` +
+           `${wdFmt.format(date)} ` +
            `${pad2(p.hour)}:${pad2(p.minute)}:${pad2(p.second)}`;
-  }
+  };
 
-  const $ = id => document.getElementById(id);
-  const tzSelect = $('tz');
-  const themeSelect = $('theme');
-  const birthdayInput = $('birthday');
-  const bannerEl = $('birthdayBanner');
-  const resetBtn = $('reset');
+  const tzSelect = document.getElementById('tz');
+  const themeSelect = document.getElementById('theme');
+  const birthdayInput = document.getElementById('birthday');
+  const bannerEl = document.getElementById('birthdayBanner');
+  const resetBtn = document.getElementById('reset');
 
-  function setText(id, value) {
-    const node = $(id);
+  const setText = (id, value) => {
+    const node = document.getElementById(id);
     const s = String(value);
     if (node.textContent !== s) node.textContent = s;
-  }
-  function updateBirthLabel() {
+  };
+  const updateBirthLabel = () => {
     setText('birthText', `${BIRTH.year} 年 ${BIRTH.month} 月 ${BIRTH.day} 日`);
-  }
+  };
 
-  function buildTimezoneSelect() {
-    tzSelect.innerHTML = '';
-    buildTzGroups();
-    for (const g of tzGroups) {
-      const opt = document.createElement('option');
-      opt.value = g.rep;
-      opt.textContent = groupLabel(g);
-      opt.title = fullGroupLabel(g);
-      tzSelect.appendChild(opt);
-    }
-  }
-
-  function setTz(tz) {
+  const setTz = (tz) => {
     const g = tzGroups.find(g => g.zones.includes(tz));
     const rep = g ? g.rep : (tzGroups[0] ? tzGroups[0].rep : DEFAULT_TZ);
     currentTz = rep;
     if (tzSelect.value !== rep) tzSelect.value = rep;
-  }
+  };
 
-  let currentTz = DEFAULT_TZ;
-  let targetTs = null;
+  /* ---------- 渲染：一帧共用同一个 Date 快照 ---------- */
+  const render = (date) => {
+    const nowMs = date.getTime();          // 只取快照的数值，不读系统时钟
+    /* 本帧唯一一次「当前时刻 → 目标时区分量」换算，后续全部复用 */
+    const parts = getParts(date, currentTz);
 
-  function refreshTarget() {
-    targetTs = getNextBirthdayTimestamp(Date.now(), currentTz);
-    setText('nextDate', formatFullDateTime(targetTs, currentTz));
-  }
+    /* 跨过目标生日时重算锚点与「下次生日」文本 */
+    if (targetTs === null || nowMs >= targetTs) {
+      const thisYear = anniversaryTs(parts.year, currentTz);
+      targetTs = thisYear <= nowMs ? anniversaryTs(parts.year + 1, currentTz) : thisYear;
+      const targetDate = new Date(targetTs);
+      targetYear = getParts(targetDate, currentTz).year;
+      setText('nextDate', formatFullDateTime(targetDate, currentTz));
+    }
 
-  function render() {
-    const now = Date.now();
-    if (targetTs === null || now >= targetTs) refreshTarget();
-
-    const diff = Math.max(0, targetTs - now);
-    const totalSec = Math.floor(diff / 1000);
+    const totalSec = Math.floor(Math.max(0, targetTs - nowMs) / 1000);
     setText('days', Math.floor(totalSec / 86400));
     setText('hours', pad2(Math.floor((totalSec % 86400) / 3600)));
     setText('minutes', pad2(Math.floor((totalSec % 3600) / 60)));
     setText('seconds', pad2(totalSec % 60));
 
-    setText('nowText', formatFullDateTime(now, currentTz));
+    setText('nowText', formatFullDateTime(date, currentTz, parts));
 
-    const nowDate = new Date(now);
-    const p = getParts(nowDate, currentTz);
-
-    const birthTs = getBirthTimestamp(currentTz);
-    const birthdayDay = clampedDay(p.year, BIRTH.month, BIRTH.day);
+    const birthdayDay = clampedDay(parts.year, BIRTH.month, BIRTH.day);
     const isBirthdayToday =
-      now >= birthTs &&
-      p.month === BIRTH.month &&
-      p.day === birthdayDay;
-
+      nowMs >= birthTs &&
+      parts.month === BIRTH.month &&
+      parts.day === birthdayDay;
     bannerEl.classList.toggle('show', isBirthdayToday);
 
-    if (isBirthdayToday) {
-      setText('flag', '');
-    } else {
-      const nextYear = getParts(new Date(targetTs), currentTz).year;
-      const nextAge = nextYear - BIRTH.year;
-      setText('flag',
-        nextAge >= 1 ? `下次生日时将满 ${nextAge} 岁` : '');
-    }
+    const nextAge = targetYear - BIRTH.year;
+    setText('flag',
+      isBirthdayToday || nextAge < 1 ? '' : `下次生日时将满 ${nextAge} 岁`);
 
     /* 年龄计时只更新年和天 */
-    const age = getAgeInfo(now, currentTz);
-    setText('ageYears', age.years);
-    setText('ageDays', age.days);
-  }
+    let ageYears = 0, ageDays = 0;
+    if (nowMs >= birthTs) {
+      let annYear = parts.year;
+      let annTs = anniversaryTs(annYear, currentTz);
+      if (annTs > nowMs) {
+        annYear -= 1;
+        annTs = anniversaryTs(annYear, currentTz);
+      }
+      const totalAgeSec = Math.floor(Math.max(0, nowMs - annTs) / 1000);
+      ageYears = Math.max(0, annYear - BIRTH.year);
+      ageDays = Math.floor(totalAgeSec / 86400);
+    }
+    setText('ageYears', ageYears);
+    setText('ageDays', ageDays);
+  };
 
-  let timerId = null;
-  function scheduleNextTick() {
-    const delay = 1001 - (Date.now() % 1000);
-    timerId = setTimeout(tick, delay);
-  }
-  function tick() {
-    render();
-    scheduleNextTick();
-  }
+  /* 配置变化：先失效派生锚点，再用同一个时刻重绘 */
+  const update = (date) => {
+    invalidateAnchors();
+    render(date);
+  };
+
+  /* ---------- 定时器：幂等调度 + 后台停表 ---------- */
+  let timerId;
+  const tick = () => {
+    /* 定时触发或页面恢复都先清掉旧 timer，始终只保留一个 */
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+      timerId = undefined;
+    }
+    if (document.hidden) return;     // 后台不渲染、不排定时
+
+    const date = new Date();         // 每帧唯一一次读取系统时钟
+    timerId = setTimeout(tick, 1001 - date.getMilliseconds());  // 先排下一帧，耗时不影响秒对齐
+    render(date);
+  };
 
   const themeMql = window.matchMedia('(prefers-color-scheme: dark)');
   let themeMode = document.documentElement.dataset.themeMode || 'system';
 
-  function resolveEffectiveTheme(mode) {
-    if (mode === 'system') return themeMql.matches ? 'dark' : 'light';
-    return mode;
-  }
-  function applyTheme() {
-    const effective = resolveEffectiveTheme(themeMode);
-    document.documentElement.dataset.theme = effective;
-    document.documentElement.dataset.themeMode = themeMode;
+  const applyTheme = () => {
+    const effective = themeMode === 'system'
+      ? (themeMql.matches ? 'dark' : 'light') : themeMode;
+    const ds = document.documentElement.dataset;
+    if (ds.theme !== effective) ds.theme = effective;
+    if (ds.themeMode !== themeMode) ds.themeMode = themeMode;
     if (themeSelect.value !== themeMode) themeSelect.value = themeMode;
-  }
+  };
 
-  themeSelect.addEventListener('change', function () {
+  themeSelect.addEventListener('change', () => {
     themeMode = themeSelect.value;
     try { localStorage.setItem(THEME_KEY, themeMode); } catch (e) {}
     applyTheme();
   });
 
-  function onSystemThemeChange() {
+  const onSystemThemeChange = () => {
     if (themeMode === 'system') applyTheme();
-  }
+  };
   if (themeMql.addEventListener) themeMql.addEventListener('change', onSystemThemeChange);
   else if (themeMql.addListener) themeMql.addListener(onSystemThemeChange);
 
-  tzSelect.addEventListener('change', function () {
+  tzSelect.addEventListener('change', () => {
     currentTz = tzSelect.value;
-    refreshTarget();
-    render();
+    update(new Date());
   });
 
-  birthdayInput.addEventListener('change', function () {
+  birthdayInput.addEventListener('change', () => {
     const v = birthdayInput.value;
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
     if (!m) return;
     const y = +m[1], mo = +m[2], d = +m[3];
     if (!isValidDate(y, mo, d)) return;
     BIRTH = { year: y, month: mo, day: d };
-    saveBirthToStorage();
+    try {
+      localStorage.setItem(BIRTH_KEY, `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`);
+    } catch (e) {}
     updateBirthLabel();
-    refreshTarget();
-    render();
+    update(new Date());
   });
 
-  resetBtn.addEventListener('click', function () {
+  resetBtn.addEventListener('click', () => {
     BIRTH = { ...DEFAULT_BIRTH };
-    clearBirthStorage();
+    try { localStorage.removeItem(BIRTH_KEY); } catch (e) {}
     birthdayInput.value = `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`;
     updateBirthLabel();
 
@@ -1038,22 +896,102 @@
     try { localStorage.removeItem(THEME_KEY); } catch (e) {}
     applyTheme();
 
-    refreshTarget();
-    render();
+    update(new Date());
   });
 
-  loadBirthFromStorage();
-  birthdayInput.value = `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`;
-  updateBirthLabel();
+  /* ---------- 启动：初始化复用 tick 传入的 Date，不再另建时钟 ---------- */
+  /* ---------- 启动：初始化完成后自己排定时并渲染首帧 ---------- */
+  {
+    const date = new Date();
+    timerId = setTimeout(tick, 1001 - date.getMilliseconds());  // 先排下一帧，初始化耗时不影响对齐
 
-  buildTimezoneSelect();
-  setTz(DEFAULT_TZ);
+    try {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(localStorage.getItem(BIRTH_KEY) || '');
+      if (m) {
+        const y = +m[1], mo = +m[2], d = +m[3];
+        if (isValidDate(y, mo, d)) BIRTH = { year: y, month: mo, day: d };
+      }
+    } catch (e) {}
+    birthdayInput.value = `${BIRTH.year}-${pad2(BIRTH.month)}-${pad2(BIRTH.day)}`;
+    updateBirthLabel();
 
-  applyTheme();
-  refreshTarget();
-  render();
-  scheduleNextTick();
-})();
+    /* 时区下拉：按未来 12 个月的偏移签名分组，同偏移合并为一个选项 */
+    {
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const zones = [];
+      const seen = new Set();
+      const push = (tz) => {
+        if (!tz || seen.has(tz)) return;
+        try { getOffsetMinutes(tz, date); } catch (e) { return; }
+        seen.add(tz);
+        zones.push(tz);
+      };
+      push(DEFAULT_TZ);
+      push(localTz);
+      let source = FALLBACK_TZ_LIST;
+      if (typeof Intl.supportedValuesOf === 'function') {
+        try {
+          const all = Intl.supportedValuesOf('timeZone');
+          if (Array.isArray(all) && all.length > 0) source = all;
+        } catch (e) {}
+      }
+      for (const tz of source) {
+        if (tz.startsWith('Etc/GMT') && tz !== 'Etc/GMT') continue;
+        push(tz);
+      }
+      push('UTC');
+      push('Etc/UTC');
+      push('Etc/GMT');
+
+      const y = date.getUTCFullYear(), m = date.getUTCMonth();
+      const sigMap = new Map();
+      for (const tz of zones) {
+        const offsets = [];
+        for (let i = 0; i < 12; i++) {
+          offsets.push(getOffsetMinutes(tz, new Date(Date.UTC(y, m + i, 1))));
+        }
+        const sig = offsets.join(',');
+        let g = sigMap.get(sig);
+        if (!g) {
+          g = { offset: getOffsetMinutes(tz, date), hasDST: new Set(offsets).size > 1, zones: [] };
+          sigMap.set(sig, g);
+        }
+        g.zones.push(tz);
+      }
+
+      const rank = (tz) => tz === DEFAULT_TZ ? 0 : tz === localTz ? 1 : 2;
+      tzGroups = Array.from(sigMap.values()).sort((a, b) => b.offset - a.offset);
+      for (const g of tzGroups) {
+        g.zones.sort((a, b) => {
+          const ra = rank(a), rb = rank(b);
+          return ra !== rb ? ra - rb : a.localeCompare(b);
+        });
+        g.rep = g.zones[0];
+      }
+
+      for (const g of tzGroups) {
+        const names = g.zones.map(shortTzName);
+        const shown = names.slice(0, 4);
+        const nameStr = names.length > 4
+          ? `${shown.join(' / ')} 等 ${names.length} 个地区`
+          : shown.join(' / ');
+        const abs = Math.abs(g.offset);
+        const offLabel = `UTC${g.offset >= 0 ? '+' : '-'}${pad2(Math.floor(abs / 60))}:${pad2(abs % 60)}`;
+        const opt = document.createElement('option');
+        opt.value = g.rep;
+        opt.textContent = `${offLabel} · ${g.hasDST ? '☀️ 夏令时 · ' : ''}${nameStr}`;
+        opt.title = `${offLabel}${g.hasDST ? ' ☀️ 含夏令时' : ''} · ${names.join(' / ')}`;
+        tzSelect.appendChild(opt);
+      }
+    }
+
+    setTz(DEFAULT_TZ);
+    applyTheme();
+    invalidateAnchors();
+    render(date);
+  }
+  document.addEventListener('visibilitychange', tick);
+}
 </script>
 </body>
 </html>
