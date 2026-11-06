@@ -292,6 +292,32 @@
     font-size: 13px;
     letter-spacing: 0;
   }
+  .age-total {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 12px;
+    padding: 20px 14px;
+    border-radius: 18px;
+    background: var(--unit-bg);
+    border: 1px solid var(--unit-border);
+    font-size: 16px;
+    color: var(--muted);
+    transition: background-color .25s ease, border-color .25s ease;
+  }
+  .age-total-inner {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+  .age-total b {
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--age-num-color);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
 
   .controls {
     display: grid;
@@ -400,12 +426,16 @@
     }
     .stack > .card:not(:first-child) {
       padding: 22px 20px;
+      justify-content: flex-start;   /* 并排两卡顶部对齐，标题保持齐平 */
     }
     .age-countdown .num {
       font-size: clamp(38px, 4vw, 48px);
     }
     .age-countdown .unit {
       padding: 22px 8px;
+    }
+    .age-total {
+      flex-grow: 1;   /* 吸收左卡底部剩余高度，与右侧表单底部齐平 */
     }
     .controls {
       grid-template-columns: minmax(0, 1fr) auto;
@@ -477,7 +507,7 @@
       padding: 9px 12px;
     }
 
-    /* 年龄计时只剩「年」「天」两项 */
+    /* 年龄计时的数字块仍为「年」「天」两项，总计天数另起一行 */
     .age-countdown {
       gap: 8px;
     }
@@ -586,6 +616,7 @@
       <div class="unit"><span class="num" id="ageYears">--</span><span class="label">年</span></div>
       <div class="unit"><span class="num" id="ageDays">--</span><span class="label">天</span></div>
     </div>
+    <div class="age-total"><span class="age-total-inner">总计 <b id="ageTotalDays">--</b> 天</span></div>
   </section>
 
   <section class="card">
@@ -709,6 +740,7 @@
   let BIRTH = { ...DEFAULT_BIRTH };
   let currentTz = DEFAULT_TZ;
   let birthTs = 0;        // 出生时刻（按当前时区），配置变化时重算
+  let birthDayIndex = 0;  // 出生日距 1970-01-01 的日历天数
   let targetTs = null;    // 下次生日时刻
   let targetYear = 0;     // 下次生日所在年份
 
@@ -735,6 +767,8 @@
   const invalidateAnchors = () => {
     anniversaryCache.clear();
     birthTs = anniversaryTs(BIRTH.year, currentTz);
+    birthDayIndex = Date.UTC(BIRTH.year, BIRTH.month - 1,
+      clampedDay(BIRTH.year, BIRTH.month, BIRTH.day)) / 86400000;
     targetTs = null;   // 由下一次 render 用同一时刻重算
   };
 
@@ -821,6 +855,11 @@
     }
     setText('ageYears', ageYears);
     setText('ageDays', ageDays);
+
+    /* 总计天数按日历计算（出生日 → 今天），不受夏令时与当前时刻影响 */
+    const totalDays = Math.max(0,
+      Math.floor(Date.UTC(parts.year, parts.month - 1, parts.day) / 86400000) - birthDayIndex);
+    setText('ageTotalDays', totalDays);
   };
 
   /* 配置变化：先失效派生锚点，再用同一个时刻重绘 */
