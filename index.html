@@ -224,8 +224,8 @@
     font-size: clamp(38px, 7vw, 56px);
     line-height: 1.05;
     letter-spacing: -0.02em;
-    /* HarmonyOS Sans 的「等宽时钟数字」是 ss01 独立字形（华为 TextClock 同款），
-       自带等宽字形，故不再用普通 tnum，秒数变化时数字不会左右晃动。 */
+    /* HarmonyOS Sans 的时钟数字为 ss01 独立字形（华为 TextClock 同款）；
+       默认数字虽同样等宽，但字形样式不同，不用 ss01 则倒计时字体不正确。 */
     -webkit-font-feature-settings: "ss01" 1;
     font-feature-settings: "ss01" 1;
     font-variant-numeric: normal;
@@ -242,26 +242,26 @@
 
   .meta {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    justify-content: center;
     gap: 10px;
     width: 100%;
     min-width: 0;
     margin: 0 auto;
-    max-width: 560px;
     font-size: 14px;
     color: var(--muted);
   }
   .meta .row {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 4px;
     min-width: 0;
-    padding: 10px 14px;
+    padding: 10px clamp(14px, 3vw, 22px);   /* 空间足够时横向多留些，窄屏回落到 14px */
     border-radius: 12px;
     background: var(--meta-row-bg);
     border: 1px solid var(--meta-row-border);
-    text-align: left;
+    text-align: center;
     transition: background-color .25s ease, border-color .25s ease;
   }
   .meta .v {
@@ -269,7 +269,7 @@
     color: var(--text);
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
-    text-align: left;
+    text-align: center;
     word-break: break-word;
   }
 
@@ -280,7 +280,7 @@
     width: 100%;
   }
   .age-countdown .unit {
-    padding: 16px 8px 14px;
+    padding: 16px 8px;
   }
   .age-countdown .num {
     font-size: clamp(34px, 5vw, 46px);
@@ -297,7 +297,7 @@
     align-items: center;
     justify-content: center;
     margin-top: 12px;
-    padding: 20px 14px;
+    padding: 16px 14px;
     border-radius: 18px;
     background: var(--unit-bg);
     border: 1px solid var(--unit-border);
@@ -317,6 +317,12 @@
     color: var(--age-num-color);
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
+  }
+  .age-note {
+    margin: 10px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
   .controls {
@@ -431,9 +437,6 @@
     .age-countdown .num {
       font-size: clamp(38px, 4vw, 48px);
     }
-    .age-countdown .unit {
-      padding: 22px 8px;
-    }
     .age-total {
       flex-grow: 1;   /* 吸收左卡底部剩余高度，与右侧表单底部齐平 */
     }
@@ -512,7 +515,7 @@
       gap: 8px;
     }
     .age-countdown .unit {
-      padding: 14px 6px 12px;
+      padding: 14px 6px;
       border-radius: 14px;
     }
     .age-countdown .num {
@@ -569,7 +572,7 @@
     .label { font-size: 12px; }
 
     .age-countdown { gap: 6px; }
-    .age-countdown .unit { padding: 12px 4px 10px; border-radius: 12px; }
+    .age-countdown .unit { padding: 12px 4px; border-radius: 12px; }
     .age-countdown .num { font-size: clamp(26px, 8.6vw, 34px); }
     .age-countdown .label { font-size: 12px; }
 
@@ -617,6 +620,7 @@
       <div class="unit"><span class="num" id="ageDays">--</span><span class="label">天</span></div>
     </div>
     <div class="age-total"><span class="age-total-inner">总计 <b id="ageTotalDays">--</b> 天</span></div>
+    <p class="age-note">从生日的0点整开始，过24小时才算1天</p>
   </section>
 
   <section class="card">
@@ -779,7 +783,7 @@
       wdFmt = new Intl.DateTimeFormat('zh-CN', { timeZone: tz, weekday: 'long' });
       weekdayFmtCache.set(tz, wdFmt);
     }
-    return `${p.year}-${pad2(p.month)}-${pad2(p.day)} ` +
+    return `${p.year}/${pad2(p.month)}/${pad2(p.day)} ` +
            `${wdFmt.format(date)} ` +
            `${pad2(p.hour)}:${pad2(p.minute)}:${pad2(p.second)}`;
   };

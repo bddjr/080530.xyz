@@ -1,3 +1,12 @@
+生成 HarmonyOS Sans SC 字体子集：HarmonyOS_Sans_SC_Regular-subset.woff2
+原始字体：D:\Desktop\fonts\HarmonyOS Sans\HarmonyOS_Sans_SC\HarmonyOS_Sans_SC_Regular.ttf
+
+两种方法都必须保留「全部 OpenType 排版特性」，否则 ss01 字形会丢失，
+倒计时字体不正确。
+
+
+========== 方法一：在线工具 ==========
+
 1. 在以下网站下载原始 ttf 字体
 https://developer.huawei.com/consumer/cn/design/resource-V1/
 
@@ -9,3 +18,43 @@ https://deertools.cn/tools/font-subset
 
 4. 在以下网站把 ttf 转成 woff2
 https://deertools.cn/tools/ttf-to-woff2
+
+
+========== 方法二：本地 fontTools（推荐，一步完成） ==========
+
+优点：可脚本化复现、直接控制 OpenType 特性、无需手动上传。
+2026-11-06 的字体用这个方法重新生成（160 字符 / 20,968 字节）。
+
+1. 安装依赖
+   python -m pip install fonttools brotli
+
+2. 准备 chars.txt
+   不要从 index.html 源码直接抽中文——JS/CSS 注释里的字会被算进去。
+   用 Chrome 打开页面并注入脚本，收集
+     document.title + document.body.innerText
+     + 所有 <option>.textContent + 所有 [title]
+   里的 CJK 汉字与中文标点，再与旧 chars.txt 取并集
+   （保留星期、时区下拉、生日横幅等动态/隐藏文本可能用到的字）。
+
+3. 子集化并直接导出 woff2（在 fonts/ 目录下执行）
+   from fontTools.ttLib import TTFont
+   from fontTools import subset
+
+   opts = subset.Options()
+   opts.layout_features = ['*']   # 必须：保留全部 GSUB/GPOS 特性，ss01 依赖它
+   opts.name_IDs = ['*']; opts.name_legacy = True; opts.name_languages = ['*']
+
+   f = TTFont(r'D:\Desktop\fonts\HarmonyOS Sans\HarmonyOS_Sans_SC\HarmonyOS_Sans_SC_Regular.ttf')
+   s = subset.Subsetter(options=opts)
+   s.populate(text=''.join(c for c in open('chars.txt', encoding='utf-8').read()
+                           if c not in '\r\n'))
+   s.subset(f)
+   f.flavor = 'woff2'             # 直接输出 woff2，不必先导出 ttf 再转换
+   f.save('HarmonyOS_Sans_SC_Regular-subset.woff2')
+
+4. 校验（缺一不可）
+   f = TTFont('HarmonyOS_Sans_SC_Regular-subset.woff2')
+   - cmap 必须覆盖 chars.txt 的全部字符（无缺字回退）
+   - 'ss01' 必须出现在
+     [r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord]
+   - 浏览器实测：ss01 下数字宽度与默认字形不同（说明特性已生效）
