@@ -825,7 +825,8 @@
       setText('nextDate', formatFullDateTime(targetDate, currentTz));
     }
 
-    const totalSec = Math.floor(Math.max(0, targetTs - nowMs) / 1000);
+    /* 向上取整：不足 1 秒也按 1 秒计，当前时间走到 59 秒时秒位显示 1 */
+    const totalSec = Math.ceil(Math.max(0, targetTs - nowMs) / 1000);
     setText('days', Math.floor(totalSec / 86400));
     setText('hours', pad2(Math.floor((totalSec % 86400) / 3600)));
     setText('minutes', pad2(Math.floor((totalSec % 3600) / 60)));
