@@ -224,8 +224,11 @@
     font-size: clamp(38px, 7vw, 56px);
     line-height: 1.05;
     letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum" 1;
+    /* HarmonyOS Sans 的「等宽时钟数字」是 ss01 独立字形（华为 TextClock 同款），
+       自带等宽字形，故不再用普通 tnum，秒数变化时数字不会左右晃动。 */
+    -webkit-font-feature-settings: "ss01" 1;
+    font-feature-settings: "ss01" 1;
+    font-variant-numeric: normal;
     color: var(--num-color);
   }
   .label {
