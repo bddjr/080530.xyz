@@ -140,7 +140,6 @@
     font-family: var(--font-sans);
     -webkit-text-size-adjust: 100%;
     background: transparent;
-    transition: color .25s ease;
   }
 
   body::before {
@@ -183,7 +182,6 @@
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
   }
 
   .card-title {
@@ -245,7 +243,6 @@
     border-radius: 18px;
     background: var(--unit-bg);
     border: 1px solid var(--unit-border);
-    transition: background-color .25s ease, border-color .25s ease;
   }
   .num {
     display: block;
@@ -292,7 +289,6 @@
     background: var(--meta-row-bg);
     border: 1px solid var(--meta-row-border);
     text-align: center;
-    transition: background-color .25s ease, border-color .25s ease;
   }
   .meta .v {
     min-width: 0;
@@ -333,7 +329,6 @@
     border: 1px solid var(--unit-border);
     font-size: 16px;
     color: var(--muted);
-    transition: background-color .25s ease, border-color .25s ease;
   }
   .age-total-inner {
     display: flex;
@@ -394,9 +389,6 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     text-decoration: none;
-    transition: border-color .15s, box-shadow .15s,
-                background-color .25s ease, color .25s ease,
-                transform .1s ease;
   }
 
   select {
@@ -432,7 +424,6 @@
   input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: .8;
-    transition: opacity .15s ease;
   }
   input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
@@ -834,7 +825,6 @@
     border-radius: inherit;
     background: var(--journey-fill);
     box-shadow: 0 2px 8px rgba(240, 120, 160, .3);
-    transition: width .6s linear;
   }
   .journey-marker {
     position: absolute;
@@ -852,7 +842,6 @@
     font-size: 12px;
     line-height: 1;
     transform: translate(-50%, -50%);
-    transition: left .6s linear;
   }
   html[data-theme="dark"] .journey-marker { background: #331f32; }
 
@@ -884,7 +873,6 @@
     overflow: hidden;
     pointer-events: none;
     opacity: 0;
-    transition: opacity .8s ease;
   }
   html[data-mood="birthday"] .confetti-rain { opacity: .42; }
   .confetti-rain i {
@@ -1048,6 +1036,22 @@
   document.documentElement.dataset.theme = mode === 'system'
     ? (mql && mql.matches ? 'dark' : 'light') : mode;
   document.documentElement.dataset.themeMode = mode;
+
+  /* 切换主题的过渡动画 */
+  document.head.insertAdjacentHTML('beforeend', `<style>
+    body { transition: color .25s ease; }
+    .card { transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease; }
+    .unit, .meta .row, .age-total { transition: background-color .25s ease, border-color .25s ease; }
+    select, input[type="date"], .btn {
+      transition: border-color .15s, box-shadow .15s,
+                  background-color .25s ease, color .25s ease,
+                  transform .1s ease;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator { transition: opacity .15s ease; }
+    .journey-fill { transition: width .6s linear; }
+    .journey-marker { transition: left .6s linear; }
+    .confetti-rain { transition: opacity .8s ease; }
+  </style>`);
 
   const DEFAULT_BIRTH = { year: 2008, month: 5, day: 30 };
   const DEFAULT_TZ = 'Asia/Shanghai';
