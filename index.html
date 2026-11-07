@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
-<meta name="theme-color" content="#eef1f8" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#07070f" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#fff7f4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#120b16" media="(prefers-color-scheme: dark)" />
 <link rel="preload" as="font" type="font/woff2" href="./fonts/HarmonyOS_Sans_SC_Regular-subset.woff2" crossorigin>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <title>距离下一个生日倒计时 · 年龄计时</title>
@@ -22,62 +22,92 @@
   :root,
   html[data-theme="light"] {
     color-scheme: light;
-    --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #dde4ff 0%, transparent 62%);
-    --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #cfeaff 0%, transparent 62%);
-    --bg-base: #eef1f8;
+    --bg-grad-1: radial-gradient(1100px 640px at 10% -12%, #ffd7e4 0%, transparent 62%);
+    --bg-grad-2: radial-gradient(900px 560px at 92% 108%, #ffe4bb 0%, transparent 62%);
+    --bg-grad-3: radial-gradient(760px 520px at 50% 46%, #eee4ff 0%, transparent 72%);
+    --bg-base: #fff7f4;
 
-    --card-bg: rgba(255, 255, 255, .72);
-    --card-border: rgba(20, 30, 60, .1);
-    --card-shadow: 0 20px 56px rgba(40, 60, 120, .14),
-                   inset 0 1px 0 rgba(255, 255, 255, .6);
+    --card-bg: rgba(255, 255, 255, .76);
+    --card-border: rgba(150, 80, 110, .12);
+    --card-shadow: 0 20px 56px rgba(190, 105, 135, .16),
+                   inset 0 1px 0 rgba(255, 255, 255, .75);
 
-    --line: rgba(20, 30, 60, .1);
-    --text: #1a1d2e;
-    --muted: #5a6178;
-    --subtitle-b: #2d3c8a;
-    --flag-color: #b07d00;
-    --unit-bg: rgba(255, 255, 255, .72);
-    --unit-border: rgba(20, 30, 60, .08);
-    --num-color: #1a1d2e;
-    --age-num-color: #b07d00;
-    --meta-row-bg: rgba(255, 255, 255, .6);
-    --meta-row-border: rgba(20, 30, 60, .07);
-    --select-bg: rgba(255, 255, 255, .85);
+    --line: rgba(150, 80, 110, .15);
+    --text: #32222c;
+    --muted: #84707d;
+    --subtitle-b: #d0507c;
+    --flag-color: #c9587f;
+    --unit-bg: rgba(255, 244, 248, .92);
+    --unit-border: rgba(200, 110, 150, .15);
+    --num-color: #32222c;
+    --age-num-color: #c3821d;
+    --meta-row-bg: rgba(255, 255, 255, .64);
+    --meta-row-border: rgba(150, 80, 110, .08);
+    --select-bg: rgba(255, 255, 255, .88);
     --select-option-bg: #ffffff;
-    --select-option-text: #1a1d2e;
-    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%235a6178' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
-    --focus-color: #3d5afe;
-    --focus-ring: rgba(61, 90, 254, .25);
+    --select-option-text: #32222c;
+    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%2384707d' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --focus-color: #e0578a;
+    --focus-ring: rgba(224, 87, 138, .22);
+
+    /* 派对装饰色 */
+    --party-pink: #ff96b8;
+    --party-pink-deep: #ef6491;
+    --party-gold: #ffd575;
+    --party-gold-deep: #f0a63c;
+    --party-mint: #96ddc9;
+    --party-mint-deep: #55b99f;
+    --party-lilac: #c0adff;
+    --party-lilac-deep: #8b6ee0;
+    --party-dot: rgba(216, 106, 150, .4);
+    --party-line: rgba(186, 100, 138, .48);
+    --journey-track: rgba(216, 106, 150, .16);
+    --journey-fill: linear-gradient(90deg, #ff9ab8, #ffcf6b);
   }
 
   html[data-theme="dark"] {
     color-scheme: dark;
-    --bg-grad-1: radial-gradient(1100px 600px at 12% -10%, #2b1055 0%, transparent 62%);
-    --bg-grad-2: radial-gradient(900px 520px at 92% 110%, #103247 0%, transparent 62%);
-    --bg-base: #07070f;
+    --bg-grad-1: radial-gradient(1100px 640px at 10% -12%, #55203f 0%, transparent 62%);
+    --bg-grad-2: radial-gradient(900px 560px at 92% 108%, #472c22 0%, transparent 62%);
+    --bg-grad-3: radial-gradient(760px 520px at 50% 46%, #2c1a48 0%, transparent 72%);
+    --bg-base: #120b16;
 
-    --card-bg: rgba(8, 9, 18, .78);
-    --card-border: rgba(255, 255, 255, .14);
+    --card-bg: rgba(26, 16, 28, .78);
+    --card-border: rgba(255, 255, 255, .13);
     --card-shadow: 0 20px 56px rgba(0, 0, 0, .55),
                    inset 0 1px 0 rgba(255, 255, 255, .06);
 
     --line: rgba(255, 255, 255, .12);
-    --text: #eef1ff;
-    --muted: #9aa4c7;
-    --subtitle-b: #cdd8ff;
-    --flag-color: #ffd479;
+    --text: #fff2f6;
+    --muted: #c9adbe;
+    --subtitle-b: #ffb3cd;
+    --flag-color: #ff9ab8;
     --unit-bg: rgba(255, 255, 255, .05);
     --unit-border: rgba(255, 255, 255, .09);
     --num-color: #ffffff;
-    --age-num-color: #ffd479;
+    --age-num-color: #ffd076;
     --meta-row-bg: rgba(255, 255, 255, .04);
     --meta-row-border: rgba(255, 255, 255, .07);
     --select-bg: rgba(255, 255, 255, .08);
-    --select-option-bg: #16162a;
-    --select-option-text: #eef1ff;
-    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%239aa4c7' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
-    --focus-color: #6f8dff;
-    --focus-ring: rgba(111, 141, 255, .25);
+    --select-option-bg: #241628;
+    --select-option-text: #fff2f6;
+    --select-arrow: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23c9adbe' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    --focus-color: #ff8fb4;
+    --focus-ring: rgba(255, 143, 180, .25);
+
+    /* 派对装饰色：暗色下压低明度，避免刺眼 */
+    --party-pink: #a8406a;
+    --party-pink-deep: #7d2b50;
+    --party-gold: #a97428;
+    --party-gold-deep: #7e5018;
+    --party-mint: #2f7d6c;
+    --party-mint-deep: #1f5e50;
+    --party-lilac: #6a53a8;
+    --party-lilac-deep: #4b387e;
+    --party-dot: rgba(255, 175, 210, .28);
+    --party-line: rgba(255, 190, 215, .3);
+    --journey-track: rgba(255, 255, 255, .12);
+    --journey-fill: linear-gradient(90deg, #ff8fb4, #ffd076);
   }
 
   :root {
@@ -587,13 +617,347 @@
     }
     .stack { gap: 10px; }
   }
+
+  /* ==================== 生日氛围层 ====================
+     纯装饰：不参与布局、不接收事件；整段删除即可回到原先的极简外观。 */
+
+  .stack {
+    position: relative;
+    z-index: 1;
+  }
+
+  .party {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--bg-grad-3);
+  }
+
+  /* 糖屑小圆点：两层不同节奏的缓慢漂移 */
+  .party::before,
+  .party::after {
+    content: "";
+    position: absolute;
+    inset: -12% 0;
+    background-image:
+      radial-gradient(circle, var(--party-dot) 0 2.5px, transparent 3px),
+      radial-gradient(circle, var(--party-dot) 0 1.8px, transparent 2.5px),
+      radial-gradient(circle, var(--party-dot) 0 2px, transparent 2.8px);
+    background-size: 220px 240px, 170px 190px, 290px 310px;
+    background-position: 24px 32px, 96px 128px, 168px 64px;
+    animation: drift 30s ease-in-out infinite alternate;
+  }
+  .party::after {
+    opacity: .5;
+    background-size: 260px 280px, 200px 220px, 320px 340px;
+    background-position: 130px 90px, 40px 180px, 210px 20px;
+    animation-duration: 42s;
+    animation-direction: alternate-reverse;
+  }
+  @keyframes drift {
+    from { transform: translate3d(0, -12px, 0); }
+    to   { transform: translate3d(10px, 16px, 0); }
+  }
+
+  /* 气球 */
+  .balloon {
+    position: absolute;
+    width: var(--size, 58px);
+    height: calc(var(--size, 58px) * 1.2);
+    border-radius: 50% 50% 46% 46% / 54% 54% 46% 46%;
+    background:
+      radial-gradient(circle at 30% 23%, rgba(255, 255, 255, .8) 0 7%, rgba(255, 255, 255, 0) 44%),
+      linear-gradient(150deg, var(--c1), var(--c2));
+    box-shadow: inset -7px -9px 16px rgba(80, 20, 55, .16),
+                0 14px 28px rgba(150, 60, 100, .16);
+    opacity: var(--alpha, .62);
+    animation: floaty var(--dur, 9s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  .balloon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid var(--c2);
+  }
+  .balloon .string {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 3px);
+    width: 1.5px;
+    height: 84px;
+    border-radius: 2px;
+    background: linear-gradient(var(--party-line), transparent);
+    transform-origin: 50% 0;
+    animation: swing 5.5s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-18px) rotate(2deg); }
+  }
+  @keyframes swing {
+    0%, 100% { transform: rotate(-7deg); }
+    50%      { transform: rotate(7deg); }
+  }
+  .b1 {
+    --c1: var(--party-pink); --c2: var(--party-pink-deep);
+    --size: 62px; left: 3.5%; top: 15%; --dur: 9s; --delay: -1s;
+  }
+  .b2 {
+    --c1: var(--party-gold); --c2: var(--party-gold-deep);
+    --size: 42px; left: 10%; top: 62%; --dur: 7.5s; --delay: -3.5s; --alpha: .5;
+  }
+  .b3 {
+    --c1: var(--party-mint); --c2: var(--party-mint-deep);
+    --size: 54px; right: 4%; top: 22%; --dur: 10.5s; --delay: -2s;
+  }
+  .b4 {
+    --c1: var(--party-lilac); --c2: var(--party-lilac-deep);
+    --size: 38px; right: 11%; top: 68%; --dur: 8s; --delay: -5s; --alpha: .5;
+  }
+
+  /* 闪烁的小星星 */
+  .spark {
+    position: absolute;
+    color: var(--party-gold-deep);
+    font-size: var(--fs, 16px);
+    line-height: 1;
+    opacity: .55;
+    animation: twinkle 4s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: .2; transform: scale(.8) rotate(0deg); }
+    50%      { opacity: .75; transform: scale(1.15) rotate(18deg); }
+  }
+  .s1 { left: 7%; top: 44%; --delay: -.5s; }
+  .s2 { right: 8%; top: 11%; --fs: 12px; --delay: -1.8s; color: var(--party-pink-deep); }
+  .s3 { right: 6%; top: 52%; --fs: 20px; --delay: -2.9s; color: var(--party-lilac-deep); }
+  .s4 { left: 15%; top: 9%; --fs: 11px; --delay: -3.6s; color: var(--party-mint-deep); }
+
+  /* 主卡上沿挂一串三角彩旗 */
+  .card--hero { position: relative; }
+  .bunting {
+    position: absolute;
+    top: -20px;
+    left: 6%;
+    right: 6%;
+    height: 26px;
+    display: flex;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .bunting::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -2%;
+    right: -2%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--party-line) 7%,
+                var(--party-line) 93%, transparent);
+  }
+  .bunting i {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 23px;
+    margin-top: 1px;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: var(--fc, var(--party-pink));
+    opacity: .92;
+    transform-origin: 50% 0;
+    animation: flagSway 5s ease-in-out infinite;
+    animation-delay: var(--fd, 0s);
+  }
+  @keyframes flagSway {
+    0%, 100% { transform: rotate(-2.5deg); }
+    50%      { transform: rotate(2.5deg); }
+  }
+  .bunting i:nth-child(5n + 1) { --fc: var(--party-pink);  --fd: -.2s; }
+  .bunting i:nth-child(5n + 2) { --fc: var(--party-gold);  --fd: -.9s; }
+  .bunting i:nth-child(5n + 3) { --fc: var(--party-mint);  --fd: -1.6s; }
+  .bunting i:nth-child(5n + 4) { --fc: var(--party-lilac); --fd: -2.3s; }
+  .bunting i:nth-child(5n + 5) { --fc: #ffa98a;             --fd: -3s; }
+
+  /* 生日旅程：上次生日 → 下次生日的进度 */
+  .journey {
+    --p: 0;
+    margin-top: 16px;
+    text-align: left;
+  }
+  .journey-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .journey-head b {
+    font-weight: 600;
+    color: var(--flag-color);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+  .journey-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .journey-label::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--party-pink-deep);
+    box-shadow: 0 0 0 3px rgba(239, 100, 145, .16);
+  }
+  .journey-track {
+    position: relative;
+    height: 8px;
+    margin-top: 9px;
+    border-radius: 999px;
+    background: var(--journey-track);
+  }
+  .journey-fill {
+    width: calc(var(--p) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--journey-fill);
+    box-shadow: 0 2px 8px rgba(240, 120, 160, .3);
+    transition: width .6s linear;
+  }
+  .journey-marker {
+    position: absolute;
+    top: 50%;
+    left: clamp(12px, calc(var(--p) * 100%), calc(100% - 12px));
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 3px 10px rgba(180, 90, 130, .28);
+    font-size: 12px;
+    line-height: 1;
+    transform: translate(-50%, -50%);
+    transition: left .6s linear;
+  }
+  html[data-theme="dark"] .journey-marker { background: #331f32; }
+
+  /* 生日周 / 生日当天：暖光加强 */
+  html[data-mood="soon"] .card--hero {
+    border-color: rgba(240, 120, 160, .38);
+    box-shadow: 0 20px 56px rgba(220, 100, 145, .22),
+                inset 0 1px 0 rgba(255, 255, 255, .75);
+  }
+  html[data-mood="soon"] .birthday-flag {
+    color: #d2476f;
+    font-weight: 600;
+    text-shadow: 0 0 14px rgba(255, 150, 185, .55);
+  }
+  html[data-theme="dark"][data-mood="soon"] .birthday-flag { color: #ff9ab8; }
+  html[data-mood="birthday"] .card--hero {
+    border-color: rgba(255, 175, 85, .5);
+    box-shadow: 0 20px 60px rgba(245, 160, 90, .3),
+                inset 0 1px 0 rgba(255, 255, 255, .75);
+  }
+  html[data-mood="birthday"] .balloon { opacity: .9; }
+  html[data-mood="birthday"] .bunting i { opacity: 1; }
+
+  /* 生日当天：彩纸雨（三层不同速度，背景位移整数平铺循环） */
+  .confetti-rain {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .8s ease;
+  }
+  html[data-mood="birthday"] .confetti-rain { opacity: .42; }
+  .confetti-rain i {
+    position: absolute;
+    inset: -100% 0 0;
+    background-image:
+      radial-gradient(circle at 20px 30px, #ff6b8a 0 3px, transparent 4px),
+      radial-gradient(circle at 120px 90px, #ffd06b 0 3px, transparent 4px),
+      radial-gradient(circle at 200px 40px, #8ed9c5 0 2.5px, transparent 3.5px),
+      radial-gradient(circle at 70px 160px, #b9a3ff 0 3px, transparent 4px),
+      radial-gradient(circle at 170px 200px, #ff9ab8 0 2.5px, transparent 3.5px);
+    background-size: 240px 240px;
+    animation: confettiFall 12s linear infinite;
+  }
+  .confetti-rain i:nth-child(2) {
+    background-size: 320px 280px;
+    background-position: 70px 40px;
+    opacity: .7;
+    animation-name: confettiFall2;
+    animation-duration: 17s;
+    animation-delay: -4s;
+  }
+  .confetti-rain i:nth-child(3) {
+    background-size: 190px 200px;
+    background-position: 30px 90px;
+    opacity: .55;
+    animation-name: confettiFall3;
+    animation-duration: 9s;
+    animation-delay: -2s;
+  }
+  @keyframes confettiFall  { to { transform: translateY(240px); } }
+  @keyframes confettiFall2 { to { transform: translateY(280px); } }
+  @keyframes confettiFall3 { to { transform: translateY(200px); } }
+
+  @media (max-width: 900px) {
+    .balloon { opacity: calc(var(--alpha, .62) * .55); }
+  }
+  @media (max-width: 560px) {
+    .b2, .b4, .s3, .s4 { display: none; }
+    .bunting { top: -16px; left: 4%; right: 4%; height: 20px; }
+    .bunting i { height: 18px; }
+    .journey { margin-top: 14px; }
+  }
+  @media (max-width: 360px) {
+    .bunting i:nth-child(n + 9) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .party::before, .party::after, .balloon, .balloon .string,
+    .spark, .bunting i, .confetti-rain i, .journey-fill, .journey-marker {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 </style>
 </head>
 <body>
 
+<div class="party" aria-hidden="true">
+  <span class="balloon b1"><i class="string"></i></span>
+  <span class="balloon b2"><i class="string"></i></span>
+  <span class="balloon b3"><i class="string"></i></span>
+  <span class="balloon b4"><i class="string"></i></span>
+  <span class="spark s1">✦</span>
+  <span class="spark s2">✦</span>
+  <span class="spark s3">✦</span>
+  <span class="spark s4">✦</span>
+</div>
+<div class="confetti-rain" aria-hidden="true"><i></i><i></i><i></i></div>
+
 <div class="stack">
 
-  <section class="card">
+  <section class="card card--hero">
+    <div class="bunting" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="birthday-banner" id="birthdayBanner">🎉 生日快乐！</div>
 
     <h1>🎂 距离下一个生日</h1>
@@ -610,6 +974,25 @@
     <div class="meta">
       <div class="row"><span>下次生日</span><span class="v" id="nextDate">--</span></div>
       <div class="row"><span>当前时间</span><span class="v" id="nowText">--</span></div>
+    </div>
+
+    <div class="journey" id="journey">
+      <div class="journey-head">
+        <span class="journey-label">生日旅程</span>
+        <b id="journeyText">--</b>
+      </div>
+      <div class="journey-track">
+        <div class="journey-fill"></div>
+        <span class="journey-marker" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="13" height="13">
+            <path d="M8 1c1 1.4 1 2.5 0 3.4C7 3.5 7 2.4 8 1Z" fill="#ff9e3d"/>
+            <rect x="7.2" y="4.5" width="1.6" height="3.4" rx=".8" fill="#ff8fa3"/>
+            <rect x="2.5" y="8.6" width="11" height="5.4" rx="1.2" fill="#ffcf6b"/>
+            <path d="M2.6 9.8q1.35 1.5 2.7 0t2.7 0 2.7 0 2.7 0" stroke="#fff6dd"
+                  stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </section>
 
@@ -793,6 +1176,7 @@
   const birthdayInput = document.getElementById('birthday');
   const bannerEl = document.getElementById('birthdayBanner');
   const resetBtn = document.getElementById('reset');
+  const journeyEl = document.getElementById('journey');
 
   const setText = (id, value) => {
     const node = document.getElementById(id);
@@ -827,12 +1211,20 @@
 
     /* 向上取整：不足 1 秒也按 1 秒计，当前时间走到 59 秒时秒位显示 1 */
     const totalSec = Math.ceil(Math.max(0, targetTs - nowMs) / 1000);
-    setText('days', Math.floor(totalSec / 86400));
+    const dayLeft = Math.floor(totalSec / 86400);
+    setText('days', dayLeft);
     setText('hours', pad2(Math.floor((totalSec % 86400) / 3600)));
     setText('minutes', pad2(Math.floor((totalSec % 3600) / 60)));
     setText('seconds', pad2(totalSec % 60));
 
     setText('nowText', formatFullDateTime(date, currentTz, parts));
+
+    /* 生日旅程：复用已缓存的锚点算进度，不额外读取系统时钟 */
+    const prevTs = anniversaryTs(targetYear - 1, currentTz);
+    const span = targetTs - prevTs;
+    const progress = span > 0 ? Math.min(1, Math.max(0, (nowMs - prevTs) / span)) : 0;
+    journeyEl.style.setProperty('--p', progress.toFixed(4));
+    setText('journeyText', `已走过 ${Math.floor(progress * 100)}% · 还有 ${dayLeft} 天`);
 
     const birthdayDay = clampedDay(parts.year, BIRTH.month, BIRTH.day);
     const isBirthdayToday =
@@ -840,6 +1232,12 @@
       parts.month === BIRTH.month &&
       parts.day === birthdayDay;
     bannerEl.classList.toggle('show', isBirthdayToday);
+
+    /* 生日当天 / 生日周：只切换一次状态，交给 CSS 做氛围加强 */
+    const mood = isBirthdayToday ? 'birthday' : dayLeft <= 7 ? 'soon' : 'normal';
+    if (document.documentElement.dataset.mood !== mood) {
+      document.documentElement.dataset.mood = mood;
+    }
 
     const nextAge = targetYear - BIRTH.year;
     setText('flag',
